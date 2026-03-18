@@ -500,19 +500,23 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                                                 <input type="text" class="form-control job-field" data-field="ObjectiveOther" placeholder="ระบุวัตถุประสงค์อื่นๆ">
                                             </div>
 
-                                            <!-- Row 1: Job No & Project Name -->
-                                            <div class="form-group-clean">
-                                                <label><i class="ti ti-dialpad"></i>JOB No.</label>
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control job-field" data-field="JobNo" placeholder="กรอกเลข Job">
-                                                    <button class="btn btn-outline-primary btn-search-job" type="button">
-                                                        <i class="ti ti-search fs-5"></i>
+                                            <!-- Row 1: Job No & Project Name (multi-row) -->
+                                            <div class="form-group-clean" style="grid-column: 1 / -1;">
+                                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                                    <label class="mb-0"><i class="ti ti-dialpad"></i>JOB No. & ชื่อโครงการ</label>
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-add-job-no">
+                                                        <i class="ti ti-plus me-1"></i>เพิ่ม Job No.
                                                     </button>
                                                 </div>
-                                            </div>
-                                            <div class="form-group-clean">
-                                                <label><i class="ti ti-sitemap"></i>ชื่อโครงการ</label>
-                                                <input type="text" class="form-control job-field" data-field="ProjectName" placeholder="ชื่อโครงการ">
+                                                <div class="job-items-container d-flex flex-column gap-2">
+                                                    <div class="job-item-row d-flex gap-2 align-items-center">
+                                                        <select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>
+                                                        <input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)" style="flex: 1;">
+                                                        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="display:none; flex-shrink:0;">
+                                                            <i class="ti ti-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             <!-- Row 2: SN & WA -->
@@ -1402,6 +1406,22 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                 placeholder: 'กรุณาเลือก WA'
             });
 
+            // Initialize JobNo select2
+            $(card).find('.job-select-jobno').select2({
+                ...select2Common,
+                placeholder: 'เลือก Job No.',
+                allowClear: true
+            });
+
+            // Auto-fill ProjectName when JobNo is selected
+            $(card).on('change.jobno', '.job-select-jobno', function() {
+                const selectedPO = $(this).val();
+                const companyName = $(card).find('[data-field="CompanyName"]').val();
+                const cacheData = (window.crmDataCache && companyName) ? (window.crmDataCache[companyName] || []) : [];
+                const matched = cacheData.find(row => row.PO_No === selectedPO);
+                $(this).closest('.job-item-row').find('.job-projectname').val(matched ? (matched.Used_For || '') : '');
+            });
+
             // Initialize GroupCtm select (multiple)
             $(card).find('.job-select-groupctm').select2({
                 ...select2Common,
@@ -1503,6 +1523,49 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
 
                 if (snSelect.hasClass('select2-hidden-accessible')) snSelect.select2('destroy');
                 snSelect.select2({ allowClear: true, theme: 'bootstrap-5', placeholder: 'กรุณาเลือก S/N' });
+
+                // Populate JobNo selects with PO_No
+                const jobnoPOMap = {};
+                data.forEach(row => { if (row.PO_No) jobnoPOMap[row.PO_No] = row.Used_For || ''; });
+                const jobnoPOOptions = Object.keys(jobnoPOMap);
+
+                card.find('.job-select-jobno').each(function() {
+                    const $sel = $(this);
+                    const currentVal = $sel.val();
+                    if ($sel.hasClass('select2-hidden-accessible')) $sel.select2('destroy');
+                    $sel.empty();
+                    jobnoPOOptions.forEach(po => $sel.append(new Option(po, po)));
+                    if (currentVal && $sel.find(`option[value="${currentVal}"]`).length > 0) $sel.val(currentVal);
+                    $sel.select2({ allowClear: true, theme: 'bootstrap-5', placeholder: 'เลือก Job No.' });
+                });
+
+                // Restore pending job items (set by renderJobCards)
+                const pendingItems = card.data('pendingJobItems');
+                if (pendingItems && pendingItems.length > 0) {
+                    card.removeData('pendingJobItems');
+                    const $container = card.find('.job-items-container');
+                    pendingItems.forEach((item, idx) => {
+                        let $row;
+                        if (idx === 0) {
+                            $row = $container.find('.job-item-row').first();
+                        } else {
+                            const $sel = $('<select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>');
+                            const $inp = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)" style="flex:1;">');
+                            const $btn = $('<button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="flex-shrink:0;"><i class="ti ti-trash"></i></button>');
+                            jobnoPOOptions.forEach(po => $sel.append(new Option(po, po)));
+                            $row = $('<div class="job-item-row d-flex gap-2 align-items-center"></div>').append($sel, $inp, $btn);
+                            $container.append($row);
+                            $sel.select2({ allowClear: true, theme: 'bootstrap-5', placeholder: 'เลือก Job No.' });
+                        }
+                        if (item.JobNo) {
+                            const $sel = $row.find('.job-select-jobno');
+                            if ($sel.find(`option[value="${item.JobNo}"]`).length === 0) $sel.append(new Option(item.JobNo, item.JobNo));
+                            $sel.val(item.JobNo).trigger('change.jobno');
+                        }
+                        if (item.ProjectName) $row.find('.job-projectname').val(item.ProjectName);
+                    });
+                    if (pendingItems.length > 1) $container.find('.btn-remove-job-row').show();
+                }
             } else {
                 console.error("CRM WA Fetch Error:", waResult.reason);
             }
@@ -1622,6 +1685,19 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
 
             const companyTypeRadio = document.querySelector('#nav-home .job-company-type:checked');
             job['CompanyType'] = companyTypeRadio ? companyTypeRadio.value : 'thai';
+
+            // Collect Job No. & ProjectName rows
+            const jobItems = [];
+            document.querySelectorAll('#nav-home .job-item-row').forEach(row => {
+                const jobno = $(row).find('.job-select-jobno').val();
+                const projname = $(row).find('.job-projectname').val();
+                if (jobno || projname) jobItems.push({ JobNo: jobno || '', ProjectName: projname || '' });
+            });
+            job.JobItems = jobItems;
+            if (jobItems.length > 0) {
+                job.JobNo = jobItems[0].JobNo;
+                job.ProjectName = jobItems[0].ProjectName;
+            }
 
             salesDetails.push(job);
             return salesDetails;
@@ -2103,78 +2179,36 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                 }
             });
 
-            // ---------- ค้นหา Job ----------
-            $(document).on('click', '.btn-search-job', function() {
+            // ---------- เพิ่ม Job No. row ----------
+            $(document).on('click', '.btn-add-job-no', function() {
                 const $card = $(this).closest('.card-body');
-                const jobno = $card.find('[data-field="JobNo"]').val();
+                const $container = $card.find('.job-items-container');
+                const companyName = $card.find('[data-field="CompanyName"]').val();
+                const cacheData = (window.crmDataCache && companyName) ? (window.crmDataCache[companyName] || []) : [];
 
-                if (!jobno) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'กรุณากรอกเลข Job',
-                        text: 'กรุณากรอกเลข Job ก่อนค้นหา'
-                    });
-                    return;
+                const jobnoPOMap = {};
+                cacheData.forEach(row => { if (row.PO_No) jobnoPOMap[row.PO_No] = row.Used_For || ''; });
+
+                const $newSelect = $('<select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>');
+                const $newInput = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)" style="flex:1;">');
+                const $removeBtn = $('<button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="flex-shrink:0;"><i class="ti ti-trash"></i></button>');
+
+                Object.keys(jobnoPOMap).forEach(po => $newSelect.append(new Option(po, po)));
+
+                const $newRow = $('<div class="job-item-row d-flex gap-2 align-items-center"></div>').append($newSelect, $newInput, $removeBtn);
+                $container.append($newRow);
+
+                $newSelect.select2({ allowClear: true, theme: 'bootstrap-5', placeholder: 'เลือก Job No.' });
+                $container.find('.btn-remove-job-row').show();
+            });
+
+            // ---------- ลบ Job No. row ----------
+            $(document).on('click', '.btn-remove-job-row', function() {
+                const $container = $(this).closest('.job-items-container');
+                $(this).closest('.job-item-row').remove();
+                if ($container.find('.job-item-row').length <= 1) {
+                    $container.find('.btn-remove-job-row').hide();
                 }
-
-                Swal.fire({
-                    title: 'กำลังโหลดข้อมูล...',
-                    text: 'โปรดรอสักครู่',
-                    allowOutsideClick: false,
-                    didOpen: () => Swal.showLoading()
-                });
-
-                const postData = (action) => $.ajax({
-                    url: 'https://innovation.asefa.co.th/ChangeRequestForm/searchjobvisit',
-                    type: 'POST',
-                    data: {
-                        jobno,
-                        action
-                    }
-                });
-
-                $.when(postData('searchjob'), postData('search'), postData('searchsn')).done((resJob, resSearch, resSn) => {
-                    try {
-                        const dataJob = JSON.parse(resJob[0]);
-                        if (!dataJob.error) {
-                            $card.find('[data-field="ProjectName"]').val(dataJob.JobName);
-                            $card.find('[data-field="CompanyName"]').val(dataJob.CustomerName);
-                        } else {
-                            $card.find('[data-field="ProjectName"], [data-field="CompanyName"]').val('');
-                        }
-                    } catch {}
-
-                    try {
-                        const dataSearch = JSON.parse(resSearch[0]);
-                        const $WA = $card.find('.job-select-wa');
-
-                        // Reset Select2 completely
-                        resetSelect2($WA);
-
-                        $WA.append(new Option('เลือกเลข WA ทั้งหมด', 'All'));
-                        if (!dataSearch.error && Array.isArray(dataSearch.Doc_No)) {
-                            dataSearch.Doc_No.forEach(item => $WA.append(new Option(item, item)));
-                        }
-                        $WA.append(new Option('-', '-')).val(null).select2({
-                            placeholder: 'กรุณาเลือก WA',
-                            allowClear: true,
-                            theme: "bootstrap-5"
-                        });
-                    } catch {}
-
-                    try {
-                        const $SN = $card.find('.job-select-sn');
-
-                        // Reset Select2 completely
-                        resetSelect2($SN);
-
-                        $SN.append(resSn[0]).select2({
-                            placeholder: 'กรุณาเลือก S/N',
-                            allowClear: true,
-                            theme: "bootstrap-5"
-                        });
-                    } catch {}
-                }).always(() => Swal.close());
             });
 
             const urlParams = new URLSearchParams(window.location.search);
@@ -3684,9 +3718,13 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
             const $card = $('#nav-home .card-body');
 
             // Populate Text fields (Standard)
-            $card.find('[data-field="JobNo"]').val(job.JobNo);
-            $card.find('[data-field="ProjectName"]').val(job.ProjectName);
             $card.find('[data-field="CompanyName"]').val(job.CompanyName);
+
+            // Store job items to restore after CRM data loads (WA result handler will apply them)
+            const jobItemsToRestore = (job.JobItems && job.JobItems.length > 0)
+                ? job.JobItems
+                : (job.JobNo ? [{ JobNo: job.JobNo, ProjectName: job.ProjectName || '' }] : []);
+            if (jobItemsToRestore.length > 0) $card.data('pendingJobItems', jobItemsToRestore);
             $card.find('[data-field="ObjectiveOther"]').val(job.ObjectiveOther || '');
             $card.find('[data-field="Detail"]').val(job.Detail || '');
 
