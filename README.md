@@ -39,10 +39,6 @@ visitorMKT/
 │   ├── visitor_status_update.php
 │   ├── send_invitation.php
 │   └── ...
-├── config/
-│   ├── base.php            # Session / Auth initialization
-│   ├── connection.php      # Database connections
-│   └── function.php        # Utility functions
 ├── layout/
 │   ├── navbar.php
 │   ├── sidebarMenu.php
@@ -68,29 +64,6 @@ visitorMKT/
 
 ---
 
-## ฐานข้อมูล
-
-ระบบเชื่อมต่อฐานข้อมูลหลายตัวผ่าน `Connection` class ใน `config/connection.php`:
-
-| Method                  | ประเภท     | Database            |
-|-------------------------|------------|---------------------|
-| `konnext_DB64()`        | SQL Server | `ASF_VisitorCompany` (หลัก) |
-| `konnext_DB64_CRM()`    | SQL Server | `ASEFA_CRM`         |
-| `konnext_DB64_ASF7()`   | SQL Server | ASF7                |
-| `konnext_lqsym()`       | MySQL      | `rypsoftcom_erp2`   |
-| `konnext_fat()`         | MySQL      | `asefa_fat`         |
-
----
-
-## Auth & Session
-
-- เข้าระบบผ่าน parameter `DataE` ที่เข้ารหัสด้วย AES-256-CBC
-- Session variables ใช้ prefix `VisitorMKT_` (เช่น `VisitorMKT_code`, `VisitorMKT_name`)
-- Permission โหลดจาก DB ผ่าน `per_menu()` เก็บใน `VisitorMKT_permision`
-- Session timeout: 7,200 วินาที (7 วัน สำหรับ mobile)
-
----
-
 ## API Pattern
 
 ทุก endpoint ใน `api/` คืนค่าเป็น JSON รูปแบบนี้:
@@ -106,17 +79,6 @@ visitorMKT/
 - `get_*.php` — อ่านข้อมูล
 - `*_action.php` — เขียน/แก้ไขข้อมูล
 - `visitor_form_*.php` — CRUD สำหรับฟอร์มผู้เยี่ยมชม
-
----
-
-## การติดตั้ง
-
-1. วางโฟลเดอร์โปรเจคไว้ใน document root ของ Web Server (Apache / Nginx)
-2. ตรวจสอบว่า PHP มี extension `sqlsrv` และ `mysqli` ติดตั้งแล้ว
-3. แก้ไขค่า connection string ใน `config/connection.php` ให้ตรงกับ server
-4. เข้าใช้งานผ่าน browser โดยส่ง parameter `DataE` ที่ถูกเข้ารหัสมาด้วย
-
-> ไม่มี build step — ไม่มี package manager — serve ได้ทันที
 
 ---
 
