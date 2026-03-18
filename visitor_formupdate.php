@@ -504,14 +504,14 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                                             <div class="form-group-clean" style="grid-column: 1 / -1;">
                                                 <div class="d-flex align-items-center justify-content-between mb-2">
                                                     <label class="mb-0"><i class="ti ti-dialpad"></i>JOB No. & ชื่อโครงการ</label>
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary btn-add-job-no">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary btn-add-job-no">
                                                         <i class="ti ti-plus me-1"></i>เพิ่ม Job No.
                                                     </button>
                                                 </div>
                                                 <div class="job-items-container d-flex flex-column gap-2">
                                                     <div class="job-item-row d-flex gap-2 align-items-center">
                                                         <select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>
-                                                        <input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)" style="flex: 1;">
+                                                        <input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)">
                                                         <button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="display:none; flex-shrink:0;">
                                                             <i class="ti ti-trash"></i>
                                                         </button>
@@ -1550,7 +1550,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                             $row = $container.find('.job-item-row').first();
                         } else {
                             const $sel = $('<select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>');
-                            const $inp = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)" style="flex:1;">');
+                            const $inp = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)">');
                             const $btn = $('<button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="flex-shrink:0;"><i class="ti ti-trash"></i></button>');
                             jobnoPOOptions.forEach(po => $sel.append(new Option(po, po)));
                             $row = $('<div class="job-item-row d-flex gap-2 align-items-center"></div>').append($sel, $inp, $btn);
@@ -2190,9 +2190,10 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                 cacheData.forEach(row => { if (row.PO_No) jobnoPOMap[row.PO_No] = row.Used_For || ''; });
 
                 const $newSelect = $('<select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>');
-                const $newInput = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)" style="flex:1;">');
+                const $newInput = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)">');
                 const $removeBtn = $('<button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="flex-shrink:0;"><i class="ti ti-trash"></i></button>');
 
+                $newSelect.append(new Option('', ''));
                 Object.keys(jobnoPOMap).forEach(po => $newSelect.append(new Option(po, po)));
 
                 const $newRow = $('<div class="job-item-row d-flex gap-2 align-items-center"></div>').append($newSelect, $newInput, $removeBtn);
