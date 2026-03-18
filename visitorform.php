@@ -450,7 +450,7 @@ include_once 'config/base.php';
                     <button class="nav-link" id="nav-travel-tab" data-bs-toggle="tab" data-bs-target="#nav-travel" type="button" role="tab" aria-controls="nav-travel" aria-selected="false">ฝ่ายขนส่ง</button>
                     <button class="nav-link" id="nav-hr-tab" data-bs-toggle="tab" data-bs-target="#nav-hr" type="button" role="tab" aria-controls="nav-hr" aria-selected="false">ฝ่าย HR</button>
                     <button class="nav-link" id="nav-lecturer-tab" data-bs-toggle="tab" data-bs-target="#nav-lecturer" type="button" role="tab" aria-controls="nav-lecturer" aria-selected="false">วิทยากร</button>
-                    <button class="nav-link" id="nav-prd-tab" data-bs-toggle="tab" data-bs-target="#nav-prd" type="button" role="tab" aria-controls="nav-prd" aria-selected="false">วางแผน</button>
+                    <button class="nav-link" id="nav-prd-tab" data-bs-toggle="tab" data-bs-target="#nav-prd" type="button" role="tab" aria-controls="nav-prd" aria-selected="false" style="display:none;">วางแผน</button>
                 </div>
             </nav>
             <div class="tab-content mb-4" id="nav-tabContent">
@@ -460,18 +460,7 @@ include_once 'config/base.php';
                         <h6 class="card-header py-3" style="background-color: #007aff; color: white;">ข้อมูลทั่วไป</h6>
                         <div class="card-body">
 
-                            <!-- Job Cards Container -->
-                            <div id="job-cards-container">
-                                <!-- Job Card Template (จะถูก clone เมื่อเพิ่ม job) -->
-                                <div class="job-card" data-job-index="0">
-                                    <div class="job-card-header">
-                                        <span class="job-number">Job #1</span>
-                                        <button type="button" class="btn-remove-job" style="display: none;" onclick="removeJobCard(this)">
-                                            <i class="ti ti-trash"></i> ลบ
-                                        </button>
-                                    </div>
-                                    <div class="job-card-body">
-                                        <div class="form-grid">
+                            <div class="form-grid">
                                             <!-- Row 0: Objective (Moved inside Job Card) -->
                                             <div class="form-group-clean full-width checkbox-group">
                                                 <label><i class="ti ti-message-user"></i>วัตถุประสงค์การเยี่ยมชม</label>
@@ -538,7 +527,12 @@ include_once 'config/base.php';
                                             <!-- Row 5: Company & Customer Group -->
                                             <div class="form-group-clean">
                                                 <label><i class="ti ti-building-skyscraper"></i>ชื่อบริษัท/หน่วยงาน</label>
-                                                <input type="text" class="form-control job-field" data-field="CompanyName" placeholder="ชื่อบริษัท">
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control job-field" data-field="CompanyName" placeholder="ชื่อบริษัท" id="companyNameInput">
+                                                    <button class="btn btn-outline-primary btn-search-company" type="button">
+                                                        <i class="ti ti-search fs-5"></i>
+                                                    </button>
+                                                </div>
                                             </div>
                                             <div class="form-group-clean">
                                                 <label><i class="ti ti-users-group"></i>กลุ่มลูกค้า</label>
@@ -603,14 +597,6 @@ include_once 'config/base.php';
                                                 <textarea class="form-control job-field" data-field="Detail" rows="3" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Add Job Button -->
-                            <button type="button" class="btn-add-job mt-3" id="addJobBtn">
-                                <i class="ti ti-plus"></i> Add Job No.
-                            </button>
 
                             <div class="section-divider">
                                 <span>ไฟล์แนบ</span>
@@ -1290,166 +1276,6 @@ include_once 'config/base.php';
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // =====================================================
-        // JOB CARD MANAGEMENT FUNCTIONS
-        // =====================================================
-
-        function addJobCard() {
-            const container = document.getElementById('job-cards-container');
-            const firstCard = container.querySelector('.job-card');
-
-            if (!firstCard) return;
-
-            // Clone the first card
-            const newCard = firstCard.cloneNode(true);
-            const newIndex = jobCounter++;
-
-            // ⚠️ IMPORTANT: ลบ Select2 containers ที่ถูก clone มา เพราะจะทำให้ Select2 เพี้ยน
-            newCard.querySelectorAll('.select2-container').forEach(el => el.remove());
-            newCard.querySelectorAll('select').forEach(select => {
-                // Remove select2-hidden-accessible class ถ้ามี
-                select.classList.remove('select2-hidden-accessible');
-                select.removeAttribute('data-select2-id');
-                select.removeAttribute('aria-hidden');
-                select.style.display = ''; // แสดง select กลับมา
-            });
-
-            // Update data-job-index
-            newCard.setAttribute('data-job-index', newIndex);
-
-            // Update job number display
-            newCard.querySelector('.job-number').textContent = `Job #${container.querySelectorAll('.job-card').length + 1}`;
-
-            // Show remove button
-            newCard.querySelector('.btn-remove-job').style.display = 'flex';
-
-            // Clear all input values
-            newCard.querySelectorAll('input[type="text"], textarea').forEach(input => {
-                input.value = '';
-            });
-
-            // Reset selects and populate with cached options
-            const requesterSelect = newCard.querySelector('.job-select-requester');
-            const tcSelect = newCard.querySelector('.job-select-tc');
-            const snSelect = newCard.querySelector('.job-select-sn');
-            const waSelect = newCard.querySelector('.job-select-wa');
-            const groupctmSelect = newCard.querySelector('.job-select-groupctm');
-            const zoneSelect = newCard.querySelector('.job-select-zone');
-            const productSelect = newCard.querySelector('.job-select-product');
-
-            if (requesterSelect) {
-                requesterSelect.innerHTML = '<option value=""></option>' + cachedOptions.requester;
-            }
-            if (tcSelect) {
-                tcSelect.innerHTML = '<option value=""></option>' + cachedOptions.tc;
-            }
-            // Clear auto-filled dept
-            const deptInput = newCard.querySelector('[data-field="RequesterDept"]');
-            if (deptInput) deptInput.value = '';
-            if (snSelect) {
-                snSelect.innerHTML = '';
-            }
-            if (waSelect) {
-                waSelect.innerHTML = '';
-            }
-            if (groupctmSelect) {
-                groupctmSelect.innerHTML = cachedOptions.groupctm || '';
-            }
-            if (zoneSelect) {
-                zoneSelect.innerHTML = cachedOptions.zone || '';
-            }
-            if (productSelect) {
-                // Reset ProductName select - use cached options
-                productSelect.innerHTML = cachedOptions.product;
-            }
-
-            // Reset Objective & Hide Other Box
-            const objectiveSelect = newCard.querySelector('.job-select-objective');
-            if (objectiveSelect) {
-                // Use cached options if available, or clear
-                objectiveSelect.innerHTML = cachedOptions.objective || '';
-                // Clear value explicitly (important because cloneNode copies state)
-                objectiveSelect.value = null;
-            }
-            const boxOther = newCard.querySelector('.box-objective-other');
-            if (boxOther) {
-                boxOther.style.display = 'none';
-                const inputOther = boxOther.querySelector('input');
-                if (inputOther) inputOther.value = '';
-            }
-
-            // Also reset CRM fields to empty but keep placeholders (select2 handled in init)
-            const crmFields = ['.job-select-contact', '.job-select-position', '.job-select-phone', '.job-select-email'];
-            crmFields.forEach(sel => {
-                const el = newCard.querySelector(sel);
-                if (el) {
-                    el.innerHTML = '<option value=""></option>';
-                    el.value = '';
-                }
-            });
-
-            // Update radio button names และ IDs สำหรับ CompanyType
-            newCard.querySelectorAll('.job-company-type').forEach((radio, i) => {
-                const suffix = i === 0 ? 'thai' : 'foreign';
-                radio.name = `companyType_job${newIndex}`;
-                radio.id = `companyType_${suffix}_job${newIndex}`;
-                if (suffix === 'thai') radio.checked = true;
-            });
-            newCard.querySelectorAll('.job-company-type + label').forEach((label, i) => {
-                const suffix = i === 0 ? 'thai' : 'foreign';
-                label.setAttribute('for', `companyType_${suffix}_job${newIndex}`);
-            });
-
-            // Append to container with animation
-            container.appendChild(newCard);
-
-            // Initialize Select2 for new selects
-            initJobCardSelects(newCard);
-
-            // Scroll to the new card
-            newCard.scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
-        }
-
-        function removeJobCard(btn) {
-            const card = btn.closest('.job-card');
-            const container = document.getElementById('job-cards-container');
-
-            // Don't allow removing if only 1 card left
-            if (container.querySelectorAll('.job-card').length <= 1) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'ไม่สามารถลบได้',
-                    text: 'ต้องมีอย่างน้อย 1 Job'
-                });
-                return;
-            }
-
-            // Add removing animation
-            card.classList.add('removing');
-
-            // Wait for animation then remove
-            setTimeout(() => {
-                card.remove();
-                renumberJobCards();
-            }, 300);
-        }
-
-        function renumberJobCards() {
-            const container = document.getElementById('job-cards-container');
-            const cards = container.querySelectorAll('.job-card');
-
-            cards.forEach((card, index) => {
-                card.querySelector('.job-number').textContent = `Job #${index + 1}`;
-
-                // Show/hide remove button
-                const removeBtn = card.querySelector('.btn-remove-job');
-                removeBtn.style.display = index === 0 && cards.length === 1 ? 'none' : 'flex';
-            });
-        }
-
         function initJobCardSelects(card) {
             const select2Common = {
                 allowClear: true,
@@ -1478,7 +1304,7 @@ include_once 'config/base.php';
             // Toggle Objective Other box
             $(card).find('.job-select-objective').on('change', function() {
                 const vals = $(this).val() || [];
-                const boxOther = $(this).closest('.job-card-body').find('.box-objective-other');
+                const boxOther = $(this).closest('.card-body').find('.box-objective-other');
                 if (vals.includes('Other')) { // Assuming 'Other' is the value for "อื่นๆ"
                     boxOther.fadeIn();
                 } else {
@@ -1495,7 +1321,7 @@ include_once 'config/base.php';
             // Auto-fill department when requester is selected
             $(card).find('.job-select-requester').off('change.requesterDept').on('change.requesterDept', function() {
                 const code = $(this).val();
-                const deptInput = $(this).closest('.job-card-body').find('[data-field="RequesterDept"]');
+                const deptInput = $(this).closest('.card-body').find('[data-field="RequesterDept"]');
                 deptInput.val(requesterDeptMap[code] || '');
             });
 
@@ -1555,38 +1381,76 @@ include_once 'config/base.php';
                 placeholder: 'เลือกหรือพิมพ์ Email'
             });
 
-            // Bind Search Job Button
-            $(card).find('.btn-search-job').off('click').on('click', function() {
-                const cardBody = $(this).closest('.job-card-body');
-                // Use existing logic to get company name (assuming it's filled or we get it from job search)
-                // BUT, user said "When btn-search-job press ... take CompanyName to use in api".
-                // We need to wait for the job search (existing) to potentially fill CompanyName first.
-                // Or is this button REPLACING the job search?
-                // Context: "When btn-search-job then got CompanyName..." impliying existing search logic runs first.
-                // We'll hook into the EXISTING logic or add a listener to the CompanyName field?
-                // Better approach: The existing search logic populates 'CompanyName'.
-                // We should watch for changes on 'CompanyName' field or manually trigger CRM fetch.
-                // However, since it's "When btn-search-job pressed", let's hook into the existing search completion if possible.
-                // Since I can't see the existing 'btn-search-job' handler here (it might be elsewhere or inline),
-                // I will add a separate handler that waits/checks or let's assume I need to implement the fetch logic
-                // and maybe trigger it additionally.
-            });
         }
 
 
         // Search CRM Data Function - Call this when CompanyName is available
         async function fetchCRMData(companyName, card) {
             if (!companyName) return;
+            window.crmDataCache = window.crmDataCache || {};
 
-            try {
-                // Show loading on fields
+            // Fetch WA/SN data (get_crm_wa.php)
+            async function fetchWAData() {
+                if (window.crmDataCache[companyName]) {
+                    return window.crmDataCache[companyName];
+                }
+                card.find('.job-select-wa, .job-select-sn').each(function() {
+                    if ($(this).hasClass('select2-hidden-accessible')) $(this).select2('destroy');
+                    $(this).html('<option value="">กำลังโหลด...</option>');
+                });
+                const res = await fetch(`api/get_crm_wa.php?q=${encodeURIComponent(companyName)}`);
+                const json = await res.json();
+                const data = (json.status && json.data) ? json.data : [];
+                window.crmDataCache[companyName] = data;
+                return data;
+            }
+
+            // Fetch contact data (crm_endpoint.php)
+            async function fetchContactData() {
                 const loadingOption = new Option('Loading...', '', false, false);
                 card.find('.job-select-contact, .job-select-position, .job-select-phone, .job-select-email').append(loadingOption).trigger('change');
-
                 const response = await fetch(`https://it.asefa.co.th/api/crm_endpoint.php?q=${encodeURIComponent(companyName)}`);
-                const resData = await response.json();
+                return await response.json();
+            }
 
-                // Clear loading
+            // Run both APIs in parallel — each result handled independently
+            const [waResult, contactResult] = await Promise.allSettled([fetchWAData(), fetchContactData()]);
+
+            // Handle WA/SN result
+            if (waResult.status === 'fulfilled') {
+                const data = waResult.value;
+                const waSelect = card.find('.job-select-wa');
+                waSelect.empty();
+                const waAdded = new Set();
+                data.forEach(row => {
+                    if (row.Doc_no && !waAdded.has(row.Doc_no)) {
+                        waSelect.append(new Option(row.Doc_no, row.Doc_no));
+                        waAdded.add(row.Doc_no);
+                    }
+                });
+
+                const snSelect = card.find('.job-select-sn');
+                snSelect.empty();
+                const snAdded = new Set();
+                data.forEach(row => {
+                    if (row.PartNo && !snAdded.has(row.PartNo)) {
+                        snSelect.append(new Option(row.PartNo, row.PartNo));
+                        snAdded.add(row.PartNo);
+                    }
+                });
+
+                if (waSelect.hasClass('select2-hidden-accessible')) waSelect.select2('destroy');
+                waSelect.select2({ allowClear: true, theme: 'bootstrap-5', placeholder: 'กรุณาเลือก WA' });
+
+                if (snSelect.hasClass('select2-hidden-accessible')) snSelect.select2('destroy');
+                snSelect.select2({ allowClear: true, theme: 'bootstrap-5', placeholder: 'กรุณาเลือก S/N' });
+            } else {
+                console.error("CRM WA Fetch Error:", waResult.reason);
+            }
+
+            // Handle contact result
+            if (contactResult.status === 'fulfilled') {
+                const resData = contactResult.value;
                 card.find('.job-select-contact option[value="Loading..."]').remove();
                 card.find('.job-select-position option[value="Loading..."]').remove();
                 card.find('.job-select-phone option[value="Loading..."]').remove();
@@ -1594,7 +1458,6 @@ include_once 'config/base.php';
 
                 if (resData && resData.data) {
                     const contacts = [];
-                    // Flatten contacts from all branches
                     if (Array.isArray(resData.data[0].Branches)) {
                         resData.data[0].Branches.forEach(branch => {
                             if (branch.Contacts && Array.isArray(branch.Contacts)) {
@@ -1605,10 +1468,8 @@ include_once 'config/base.php';
                         contacts.push(...resData.data[0].Branches.Contacts);
                     }
 
-                    // *** เก็บ contacts data ไว้ใน card สำหรับ auto-fill ***
                     card.data('contacts', contacts);
 
-                    // Populate Selects with all unique values
                     const updateSelect = ($select, items, key) => {
                         $select.empty();
                         const added = new Set();
@@ -1627,16 +1488,12 @@ include_once 'config/base.php';
                     updateSelect(card.find('.job-select-phone'), contacts, 'Mobile');
                     updateSelect(card.find('.job-select-email'), contacts, 'Emails');
 
-                    // *** เพิ่ม Auto-fill logic เมื่อเลือก CustomerName ***
                     setupContactAutoFill(card);
                 }
-
-            } catch (error) {
-                console.error("CRM Fetch Error:", error);
-                // Clear loading on error
-                card.find('.job-select-contact, .job-select-position, .job-select-phone, .job-select-email').each(function() {
-                    $(this).find('option[value="Loading..."]').remove();
-                });
+            } else {
+                console.error("CRM Contact Fetch Error:", contactResult.reason);
+                card.find('.job-select-contact, .job-select-position, .job-select-phone, .job-select-email')
+                    .find('option[value="Loading..."]').remove();
             }
         }
 
@@ -1679,45 +1536,35 @@ include_once 'config/base.php';
         }
 
         function collectSalesDetail() {
-            const container = document.getElementById('job-cards-container');
-            const cards = container.querySelectorAll('.job-card');
             const salesDetails = [];
+            const job = {};
 
-            cards.forEach((card, index) => {
-                const job = {};
+            document.querySelectorAll('#nav-home .job-field').forEach(field => {
+                const fieldName = field.getAttribute('data-field');
+                if (!fieldName) return;
 
-                // Collect text fields and selects
-                card.querySelectorAll('.job-field').forEach(field => {
-                    const fieldName = field.getAttribute('data-field');
-                    if (!fieldName) return;
-
-                    if (field.tagName === 'SELECT' && field.multiple) {
-                        // Get selected values from Select2
-                        const $select = $(field);
-                        let val = $select.val() || [];
-                        // Force JSON string สำหรับ multiple selects ที่ต้อง map index กัน
-                        const jsonFields = ['ProductName', 'CustomerName', 'Position', 'PhoneNumber', 'Emails'];
-                        if (jsonFields.includes(fieldName)) {
-                            job[fieldName] = JSON.stringify(val);
-                        } else {
-                            job[fieldName] = val;
-                        }
-                    } else if (field.tagName === 'SELECT') {
-                        job[fieldName] = $(field).val() || '';
-                    } else if (field.tagName === 'TEXTAREA') {
-                        job[fieldName] = field.value || '';
+                if (field.tagName === 'SELECT' && field.multiple) {
+                    const $select = $(field);
+                    let val = $select.val() || [];
+                    const jsonFields = ['ProductName', 'CustomerName', 'Position', 'PhoneNumber', 'Emails'];
+                    if (jsonFields.includes(fieldName)) {
+                        job[fieldName] = JSON.stringify(val);
                     } else {
-                        job[fieldName] = field.value || '';
+                        job[fieldName] = val;
                     }
-                });
-
-                // Collect CompanyType radio button
-                const companyTypeRadio = card.querySelector('.job-company-type:checked');
-                job['CompanyType'] = companyTypeRadio ? companyTypeRadio.value : 'thai';
-
-                salesDetails.push(job);
+                } else if (field.tagName === 'SELECT') {
+                    job[fieldName] = $(field).val() || '';
+                } else if (field.tagName === 'TEXTAREA') {
+                    job[fieldName] = field.value || '';
+                } else {
+                    job[fieldName] = field.value || '';
+                }
             });
 
+            const companyTypeRadio = document.querySelector('#nav-home .job-company-type:checked');
+            job['CompanyType'] = companyTypeRadio ? companyTypeRadio.value : 'thai';
+
+            salesDetails.push(job);
             return salesDetails;
         }
 
@@ -2003,16 +1850,15 @@ include_once 'config/base.php';
             objectiveHTML += '<option value="Other">อื่นๆ</option>';
             cachedOptions.objective = objectiveHTML;
 
-            // Populate and Init First Job Card Selects
-            $('.job-card').each(function() {
-                // Reset fields
-                const card = this;
-                const objSelect = $(card).find('.job-select-objective');
+            // Populate and Init Sales Card Body Selects
+            const salesCardBodyInit = document.querySelector('#nav-home .card-body');
+            if (salesCardBodyInit) {
+                const objSelect = $(salesCardBodyInit).find('.job-select-objective');
                 objSelect.html(cachedOptions.objective);
 
                 // Initialize all selects (this binds events including Other toggle)
-                initJobCardSelects(card);
-            });
+                initJobCardSelects(salesCardBodyInit);
+            }
 
             empAllRes.forEach(e => {
                 requesterHTML += `<option value="${e.Code}">${e.FullName}</option>`;
@@ -2029,14 +1875,14 @@ include_once 'config/base.php';
 
             $('#Lecturer').html(lecturerHTML);
 
-            // Populate selects ใน Job Card ตัวแรก
-            const firstCard = document.querySelector('.job-card');
-            if (firstCard) {
-                $(firstCard).find('.job-select-requester').html('<option value=""></option>' + requesterHTML);
-                $(firstCard).find('.job-select-tc').html('<option value=""></option>' + tcHTML);
+            // Populate selects ใน Sales Card Body
+            const salesCardBody = document.querySelector('#nav-home .card-body');
+            if (salesCardBody) {
+                $(salesCardBody).find('.job-select-requester').html('<option value=""></option>' + requesterHTML);
+                $(salesCardBody).find('.job-select-tc').html('<option value=""></option>' + tcHTML);
 
-                // Init Select2 for first Job Card
-                initJobCardSelects(firstCard);
+                // Init Select2 for Sales Card
+                initJobCardSelects(salesCardBody);
             }
 
             // ---------- Select2 Init สำหรับ Lecturer เท่านั้น ----------
@@ -2050,9 +1896,13 @@ include_once 'config/base.php';
                 placeholder: 'กรุณาเลือกรายชื่อวิทยากร'
             }).val(null).trigger('change');
 
-            // Bind Add Job Button
-            $('#addJobBtn').on('click', function() {
-                addJobCard();
+            // Bind Company Search Button
+            $(document).on('click', '.btn-search-company', function() {
+                const card = $(this).closest('.card-body');
+                const companyName = $(this).closest('.input-group').find('[data-field="CompanyName"]').val().trim();
+                if (companyName) {
+                    fetchCRMData(companyName, card);
+                }
             });
 
             $('.dateTrival').datepicker({
@@ -2188,7 +2038,7 @@ include_once 'config/base.php';
 
             // ---------- ค้นหา Job ----------
             $(document).on('click', '.btn-search-job', function() {
-                const $card = $(this).closest('.job-card');
+                const $card = $(this).closest('.card-body');
                 const jobno = $card.find('[data-field="JobNo"]').val();
 
                 if (!jobno) {
@@ -2315,7 +2165,7 @@ include_once 'config/base.php';
                     let salesDetail = JSON.parse(d.SalesDetail || '[]');
                     if (salesDetail.length > 0) {
                         const firstJob = salesDetail[0];
-                        const $firstCard = $('.job-card').first();
+                        const $firstCard = $('#nav-home .card-body');
                         if (firstJob.requester) {
                             $firstCard.find('.job-select-requester').val(firstJob.requester).trigger('change');
                         }
@@ -2466,10 +2316,10 @@ include_once 'config/base.php';
                 // Cache groupctm สำหรับใช้ใน addJobCard
                 cachedOptions.groupctm = groupctmHTML;
 
-                // Populate groupctm ใน Job Card ตัวแรก
-                const firstCard = document.querySelector('.job-card');
-                if (firstCard) {
-                    $(firstCard).find('.job-select-groupctm').html(groupctmHTML);
+                // Populate groupctm ใน Sales Card Body
+                const salesCardBodyGrp = document.querySelector('#nav-home .card-body');
+                if (salesCardBodyGrp) {
+                    $(salesCardBodyGrp).find('.job-select-groupctm').html(groupctmHTML);
                 }
 
             } catch (err) {
