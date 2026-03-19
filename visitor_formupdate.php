@@ -1466,6 +1466,14 @@ endif; ?>
             if (!companyName) return;
             window.crmDataCache = window.crmDataCache || {};
 
+            // Capture current values BEFORE any async operation destroys them
+            const savedWA = card.find('.job-select-wa').val() || [];
+            const savedSN = card.find('.job-select-sn').val() || [];
+            const savedContact = card.find('.job-select-contact').val() || [];
+            const savedPosition = card.find('.job-select-position').val() || [];
+            const savedPhone = card.find('.job-select-phone').val() || [];
+            const savedEmail = card.find('.job-select-email').val() || [];
+
             // Fetch WA/SN data (get_crm_wa.php)
             async function fetchWAData() {
                 if (window.crmDataCache[companyName]) {
@@ -1497,7 +1505,7 @@ endif; ?>
             if (waResult.status === 'fulfilled') {
                 const data = waResult.value;
                 const waSelect = card.find('.job-select-wa');
-                const prevWA = waSelect.val() || [];
+                const prevWA = savedWA;
                 waSelect.empty();
                 const waAdded = new Set();
                 data.forEach(row => {
@@ -1516,12 +1524,12 @@ endif; ?>
                 if (prevWA.length > 0) waSelect.val(prevWA);
 
                 const snSelect = card.find('.job-select-sn');
-                const prevSN = snSelect.val() || [];
+                const prevSN = savedSN;
                 snSelect.empty();
                 const snAdded = new Set();
                 data.forEach(row => {
                     if (row.PartNo && !snAdded.has(row.PartNo)) {
-                        snSelect.append(new Option(row.PartNo + (row.PartName ? ' - ' + row.PartName : ''), row.PartNo));
+                        snSelect.append(new Option(row.PartNo, row.PartNo));
                         snAdded.add(row.PartNo);
                     }
                 });
@@ -1609,8 +1617,16 @@ endif; ?>
 
                     card.data('contacts', contacts);
 
+                    const savedMap = {
+                        '.job-select-contact': savedContact,
+                        '.job-select-position': savedPosition,
+                        '.job-select-phone': savedPhone,
+                        '.job-select-email': savedEmail
+                    };
                     const updateSelect = ($select, items, key) => {
-                        const prevVals = $select.val() || [];
+                        // Use saved values captured before async ops wiped them
+                        const cls = Object.keys(savedMap).find(c => $select.is(c));
+                        const prevVals = cls ? savedMap[cls] : ($select.val() || []);
                         $select.empty();
                         const added = new Set();
                         items.forEach(c => {
