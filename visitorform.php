@@ -471,6 +471,21 @@ include_once 'config/base.php';
                                                 <input type="text" class="form-control job-field" data-field="ObjectiveOther" placeholder="ระบุวัตถุประสงค์อื่นๆ">
                                             </div>
 
+                                            <!-- Row 5: Company & Customer Group -->
+                                            <div class="form-group-clean">
+                                                <label><i class="ti ti-building-skyscraper"></i>ชื่อบริษัท/หน่วยงาน</label>
+                                                <div class="input-group">
+                                                    <input type="text" class="form-control job-field" data-field="CompanyName" placeholder="ชื่อบริษัท" id="companyNameInput">
+                                                    <button class="btn btn-outline-primary btn-search-company" type="button">
+                                                        <i class="ti ti-search fs-5"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="form-group-clean">
+                                                <label><i class="ti ti-users-group"></i>กลุ่มลูกค้า</label>
+                                                <select class="form-select job-field job-select-groupctm" data-field="GroupCtm" multiple></select>
+                                            </div>
+
                                             <div class="form-group-clean">
                                                 <label><i class="ti ti-user-dollar"></i>ผู้ร้องขอ</label>
                                                 <select class="form-select job-field job-select-requester" data-field="RequesterCode">
@@ -478,7 +493,7 @@ include_once 'config/base.php';
                                             </div>
                                             <div class="form-group-clean">
                                                 <label><i class="ti ti-vector-bezier"></i>แผนก</label>
-                                                <input type="text" class="form-control job-field" data-field="RequesterDept" placeholder="แผนก (อัตโนมัติ)" readonly>
+                                                <input type="text" class="form-control job-field" data-field="RequesterDept" placeholder="แผนก" readonly>
                                             </div>
 
                                             <!-- Row 1: Job No & Project Name (multi-row) -->
@@ -492,7 +507,7 @@ include_once 'config/base.php';
                                                 <div class="job-items-container d-flex flex-column gap-2">
                                                     <div class="job-item-row d-flex gap-2 align-items-center">
                                                         <select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>
-                                                        <input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)">
+                                                        <input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ">
                                                         <button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="display:none; flex-shrink:0;">
                                                             <i class="ti ti-trash"></i>
                                                         </button>
@@ -502,12 +517,12 @@ include_once 'config/base.php';
 
                                             <!-- Row 2: SN & WA -->
                                             <div class="form-group-clean">
-                                                <label><i class="ti ti-barcode"></i>Switchboard/Serial</label>
-                                                <select class="form-select job-field job-select-sn selectable" data-field="SN" multiple></select>
-                                            </div>
-                                            <div class="form-group-clean">
                                                 <label><i class="ti ti-hash"></i>WA No.</label>
                                                 <select class="form-select job-field job-select-wa selectable" data-field="WA" multiple></select>
+                                            </div>
+                                            <div class="form-group-clean">
+                                                <label><i class="ti ti-barcode"></i>Switchboard/Serial</label>
+                                                <select class="form-select job-field job-select-sn selectable" data-field="SN" multiple></select>
                                             </div>
 
                                             <!-- Row 3: TC & Product -->
@@ -527,21 +542,6 @@ include_once 'config/base.php';
                                             </div>
 
                                             <!-- Row 4: Requester & Department -->
-
-                                            <!-- Row 5: Company & Customer Group -->
-                                            <div class="form-group-clean">
-                                                <label><i class="ti ti-building-skyscraper"></i>ชื่อบริษัท/หน่วยงาน</label>
-                                                <div class="input-group">
-                                                    <input type="text" class="form-control job-field" data-field="CompanyName" placeholder="ชื่อบริษัท" id="companyNameInput">
-                                                    <button class="btn btn-outline-primary btn-search-company" type="button">
-                                                        <i class="ti ti-search fs-5"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="form-group-clean">
-                                                <label><i class="ti ti-users-group"></i>กลุ่มลูกค้า</label>
-                                                <select class="form-select job-field job-select-groupctm" data-field="GroupCtm" multiple></select>
-                                            </div>
 
                                             <!-- Row 6: Customer Name & Position -->
                                             <div class="form-group-clean">
@@ -1054,9 +1054,9 @@ include_once 'config/base.php';
                             <!-- Panel สำหรับวิทยากรภายนอก -->
                             <div id="externalLecturerPanel" class="border rounded p-3 mb-3" style="display: none; background: #fafafa;">
                                 <div class="row mb-3">
-                                    <label class="col-sm-2 col-form-label"><i class="ti ti-user-plus fs-5 me-2"></i>รายละเอียดวิทยากรภายนอก</label>
+                                    <label class="col-sm-2 col-form-label"><i class="ti ti-user-plus fs-5 me-2"></i>รายละเอียด</label>
                                     <div class="col-sm-10">
-                                        <textarea class="form-control" id="externalLecturerDetail" rows="4" placeholder="กรุณาระบุรายละเอียดวิทยากรภายนอก เช่น ชื่อ-นามสกุล, สังกัด, หัวข้อบรรยาย"></textarea>
+                                        <textarea class="form-control" id="externalLecturerDetail" rows="4" placeholder="กรุณาระบุรายละเอียด เช่น ชื่อ-นามสกุล, สังกัด, หัวข้อบรรยาย"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -1115,7 +1115,7 @@ include_once 'config/base.php';
         <?php include('layout/theme-settings.php'); ?>
 
         <?php //include('layout/footer.php'); 
-        ?>
+?>
 
     </main>
 
@@ -1475,6 +1475,7 @@ include_once 'config/base.php';
                     const currentVal = $sel.val();
                     if ($sel.hasClass('select2-hidden-accessible')) $sel.select2('destroy');
                     $sel.empty();
+                    $sel.append(new Option('', ''));
                     jobnoPOOptions.forEach(po => $sel.append(new Option(po, po)));
                     if (currentVal && $sel.find(`option[value="${currentVal}"]`).length > 0) $sel.val(currentVal);
                     $sel.select2({ allowClear: true, theme: 'bootstrap-5', placeholder: 'เลือก Job No.' });
@@ -1491,7 +1492,7 @@ include_once 'config/base.php';
                             $row = $container.find('.job-item-row').first();
                         } else {
                             const $sel = $('<select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>');
-                            const $inp = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)">');
+                            const $inp = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ">');
                             const $btn = $('<button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="flex-shrink:0;"><i class="ti ti-trash"></i></button>');
                             jobnoPOOptions.forEach(po => $sel.append(new Option(po, po)));
                             $row = $('<div class="job-item-row d-flex gap-2 align-items-center"></div>').append($sel, $inp, $btn);
@@ -2056,31 +2057,27 @@ include_once 'config/base.php';
                 }
             });
 
-            $('#food_3').on('change', function() {
-                if (this.checked) {
-                    $('#food_1, #food_2').prop('checked', false);
-                    $('.food-choice').prop('disabled', true);
-                }
-            });
-
-            $('#food_1, #food_2').on('change', function() {
-                if (this.checked) {
-                    $('#food_3').prop('checked', false);
-                }
-            });
-
-            $('#food_2').on('change', function() {
-                if (this.checked) {
-                    $('.food-choice').prop('disabled', false);
-                }
-            });
-
+            // CusFood checkboxes - food_1/food_2 เลือกได้พร้อมกัน, food_3 exclusive
             $('input[name="CusFood[]"]').on('change', function() {
-                const anyChecked = $('input[name="CusFood[]"]:checked').length > 0;
+                const clickedValue = $(this).val();
 
-                if (!anyChecked) {
-                    $('#food_3').prop('checked', true);
-                    $('.food-choice').prop('disabled', true);
+                if (this.checked) {
+                    if (clickedValue === 'EatOutside') {
+                        // food_3 selected: uncheck food_1, food_2 and disable food choices
+                        $('#food_1, #food_2').prop('checked', false);
+                        $('.food-choice').prop('disabled', true).prop('checked', false);
+                    } else {
+                        // food_1 or food_2 selected: uncheck food_3, enable food choices
+                        $('#food_3').prop('checked', false);
+                        $('.food-choice').prop('disabled', false);
+                    }
+                } else {
+                    // If nothing is checked, default to EatOutside
+                    const anyChecked = $('input[name="CusFood[]"]:checked').length > 0;
+                    if (!anyChecked) {
+                        $('#food_3').prop('checked', true);
+                        $('.food-choice').prop('disabled', true).prop('checked', false);
+                    }
                 }
             });
 
@@ -2123,7 +2120,7 @@ include_once 'config/base.php';
                 cacheData.forEach(row => { if (row.PO_No) jobnoPOMap[row.PO_No] = row.Used_For || ''; });
 
                 const $newSelect = $('<select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>');
-                const $newInput = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)">');
+                const $newInput = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ">');
                 const $removeBtn = $('<button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="flex-shrink:0;"><i class="ti ti-trash"></i></button>');
 
                 $newSelect.append(new Option('', ''));

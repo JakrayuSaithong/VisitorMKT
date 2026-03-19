@@ -500,66 +500,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                                                 <input type="text" class="form-control job-field" data-field="ObjectiveOther" placeholder="ระบุวัตถุประสงค์อื่นๆ">
                                             </div>
 
-                                            <!-- Row 1: Job No & Project Name (multi-row) -->
-                                            <div class="form-group-clean" style="grid-column: 1 / -1;">
-                                                <div class="d-flex align-items-center justify-content-between mb-2">
-                                                    <label class="mb-0"><i class="ti ti-dialpad"></i>JOB No. & ชื่อโครงการ</label>
-                                                    <button type="button" class="btn btn-sm btn-outline-primary btn-add-job-no">
-                                                        <i class="ti ti-plus me-1"></i>เพิ่ม Job No.
-                                                    </button>
-                                                </div>
-                                                <div class="job-items-container d-flex flex-column gap-2">
-                                                    <div class="job-item-row d-flex gap-2 align-items-center">
-                                                        <select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>
-                                                        <input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)">
-                                                        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="display:none; flex-shrink:0;">
-                                                            <i class="ti ti-trash"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Row 2: SN & WA -->
-                                            <div class="form-group-clean">
-                                                <label><i class="ti ti-barcode"></i>Switchboard/Serial</label>
-                                                <select class="form-select job-field job-select-sn selectable" data-field="SN" multiple></select>
-                                            </div>
-                                            <div class="form-group-clean">
-                                                <label><i class="ti ti-hash"></i>WA No.</label>
-                                                <select class="form-select job-field job-select-wa selectable" data-field="WA" multiple></select>
-                                            </div>
-
-                                            <!-- Row 3: TC & Product -->
-                                            <div class="form-group-clean">
-                                                <label><i class="ti ti-user-cog"></i>TC ผู้ดูแล</label>
-                                                <select class="form-select job-field job-select-tc" data-field="TCName">
-                                                    <option value=""></option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group-clean">
-                                                <label><i class="ti ti-archive"></i>ชื่อผลิตภัณฑ์</label>
-                                                <select class="form-select job-field job-select-product" data-field="ProductName" multiple>
-                                                    <option value=""></option>
-                                                    <option value="AMS">AMS</option>
-                                                    <option value="MV">MV</option>
-                                                    <option value="PRISMA">PRISMA</option>
-                                                    <option value="BS">BS</option>
-                                                </select>
-                                            </div>
-
-                                            <!-- Row 4: Requester & Department -->
-                                            <div class="form-group-clean">
-                                                <label><i class="ti ti-user-dollar"></i>ผู้ร้องขอ</label>
-                                                <select class="form-select job-field job-select-requester" data-field="RequesterCode">
-                                                    <option value=""></option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group-clean">
-                                                <label><i class="ti ti-vector-bezier"></i>แผนก</label>
-                                                <input type="text" class="form-control job-field" data-field="RequesterDept" placeholder="แผนก (อัตโนมัติ)" readonly>
-                                            </div>
-
-                                            <!-- Row 5: Company & Customer Group -->
+                                            <!-- Row 1: Company & Customer Group -->
                                             <div class="form-group-clean">
                                                 <label><i class="ti ti-building-skyscraper"></i>ชื่อบริษัท/หน่วยงาน</label>
                                                 <div class="input-group">
@@ -572,6 +513,62 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                                             <div class="form-group-clean">
                                                 <label><i class="ti ti-users-group"></i>กลุ่มลูกค้า</label>
                                                 <select class="form-select job-field job-select-groupctm" data-field="GroupCtm" multiple></select>
+                                            </div>
+
+                                            <!-- Row 2: Requester & Department -->
+                                            <div class="form-group-clean">
+                                                <label><i class="ti ti-user-dollar"></i>ผู้ร้องขอ</label>
+                                                <select class="form-select job-field job-select-requester" data-field="RequesterCode">
+                                                </select>
+                                            </div>
+                                            <div class="form-group-clean">
+                                                <label><i class="ti ti-vector-bezier"></i>แผนก</label>
+                                                <input type="text" class="form-control job-field" data-field="RequesterDept" placeholder="แผนก" readonly>
+                                            </div>
+
+                                            <!-- Row 3: Job No & Project Name (multi-row) -->
+                                            <div class="form-group-clean" style="grid-column: 1 / -1;">
+                                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                                    <label class="mb-0"><i class="ti ti-dialpad"></i>JOB No. & ชื่อโครงการ</label>
+                                                    <button type="button" class="btn btn-sm btn-outline-primary btn-add-job-no">
+                                                        <i class="ti ti-plus me-1"></i>เพิ่ม Job No.
+                                                    </button>
+                                                </div>
+                                                <div class="job-items-container d-flex flex-column gap-2">
+                                                    <div class="job-item-row d-flex gap-2 align-items-center">
+                                                        <select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>
+                                                        <input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ">
+                                                        <button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="display:none; flex-shrink:0;">
+                                                            <i class="ti ti-trash"></i>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Row 4: WA & SN -->
+                                            <div class="form-group-clean">
+                                                <label><i class="ti ti-hash"></i>WA No.</label>
+                                                <select class="form-select job-field job-select-wa selectable" data-field="WA" multiple></select>
+                                            </div>
+                                            <div class="form-group-clean">
+                                                <label><i class="ti ti-barcode"></i>Switchboard/Serial</label>
+                                                <select class="form-select job-field job-select-sn selectable" data-field="SN" multiple></select>
+                                            </div>
+
+                                            <!-- Row 5: TC & Product -->
+                                            <div class="form-group-clean">
+                                                <label><i class="ti ti-user-cog"></i>TC ผู้ดูแล</label>
+                                                <select class="form-select job-field job-select-tc" data-field="TCName">
+                                                </select>
+                                            </div>
+                                            <div class="form-group-clean">
+                                                <label><i class="ti ti-archive"></i>ชื่อผลิตภัณฑ์</label>
+                                                <select class="form-select job-field job-select-product" data-field="ProductName" multiple>
+                                                    <option value="AMS">AMS</option>
+                                                    <option value="MV">MV</option>
+                                                    <option value="PRISMA">PRISMA</option>
+                                                    <option value="BS">BS</option>
+                                                </select>
                                             </div>
 
                                             <!-- Row 6: Customer Name & Position -->
@@ -1085,9 +1082,9 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                             <!-- Panel สำหรับวิทยากรภายนอก -->
                             <div id="externalLecturerPanel" class="border rounded p-3 mb-3" style="display: none; background: #fafafa;">
                                 <div class="row mb-3">
-                                    <label class="col-sm-2 col-form-label"><i class="ti ti-user-plus fs-5 me-2"></i>รายละเอียดวิทยากรภายนอก</label>
+                                    <label class="col-sm-2 col-form-label"><i class="ti ti-user-plus fs-5 me-2"></i>รายละเอียด</label>
                                     <div class="col-sm-10">
-                                        <textarea class="form-control" id="externalLecturerDetail" rows="4" placeholder="กรุณาระบุรายละเอียดวิทยากรภายนอก เช่น ชื่อ-นามสกุล, สังกัด, หัวข้อบรรยาย"></textarea>
+                                        <textarea class="form-control" id="externalLecturerDetail" rows="4" placeholder="กรุณาระบุรายละเอียด เช่น ชื่อ-นามสกุล, สังกัด, หัวข้อบรรยาย"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -1141,7 +1138,8 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                             <div id="prdSaveBar" class="text-end" style="display:none;">
                                 <button type="button" class="btn btn-success text-white" onclick="savePRDDetail()"><i class="ti ti-device-floppy me-1"></i>บันทึก PRD</button>
                             </div>
-                            <?php endif; ?>
+                            <?php
+endif; ?>
                         </div>
                     </div>
                 </div>
@@ -1152,7 +1150,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
         <?php include('layout/theme-settings.php'); ?>
 
         <?php //include('layout/footer.php'); 
-        ?>
+?>
 
     </main>
 
@@ -1499,6 +1497,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
             if (waResult.status === 'fulfilled') {
                 const data = waResult.value;
                 const waSelect = card.find('.job-select-wa');
+                const prevWA = waSelect.val() || [];
                 waSelect.empty();
                 const waAdded = new Set();
                 data.forEach(row => {
@@ -1507,8 +1506,17 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                         waAdded.add(row.Doc_no);
                     }
                 });
+                // Re-add previously selected values not in CRM data
+                prevWA.forEach(v => {
+                    if (v && !waAdded.has(v)) {
+                        waSelect.append(new Option(v, v));
+                        waAdded.add(v);
+                    }
+                });
+                if (prevWA.length > 0) waSelect.val(prevWA);
 
                 const snSelect = card.find('.job-select-sn');
+                const prevSN = snSelect.val() || [];
                 snSelect.empty();
                 const snAdded = new Set();
                 data.forEach(row => {
@@ -1517,6 +1525,14 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                         snAdded.add(row.PartNo);
                     }
                 });
+                // Re-add previously selected values not in CRM data
+                prevSN.forEach(v => {
+                    if (v && !snAdded.has(v)) {
+                        snSelect.append(new Option(v, v));
+                        snAdded.add(v);
+                    }
+                });
+                if (prevSN.length > 0) snSelect.val(prevSN);
 
                 if (waSelect.hasClass('select2-hidden-accessible')) waSelect.select2('destroy');
                 waSelect.select2({ allowClear: true, theme: 'bootstrap-5', placeholder: 'กรุณาเลือก WA' });
@@ -1534,6 +1550,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                     const currentVal = $sel.val();
                     if ($sel.hasClass('select2-hidden-accessible')) $sel.select2('destroy');
                     $sel.empty();
+                    $sel.append(new Option('', ''));
                     jobnoPOOptions.forEach(po => $sel.append(new Option(po, po)));
                     if (currentVal && $sel.find(`option[value="${currentVal}"]`).length > 0) $sel.val(currentVal);
                     $sel.select2({ allowClear: true, theme: 'bootstrap-5', placeholder: 'เลือก Job No.' });
@@ -1550,7 +1567,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                             $row = $container.find('.job-item-row').first();
                         } else {
                             const $sel = $('<select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>');
-                            const $inp = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)">');
+                            const $inp = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ">');
                             const $btn = $('<button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="flex-shrink:0;"><i class="ti ti-trash"></i></button>');
                             jobnoPOOptions.forEach(po => $sel.append(new Option(po, po)));
                             $row = $('<div class="job-item-row d-flex gap-2 align-items-center"></div>').append($sel, $inp, $btn);
@@ -1560,7 +1577,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                         if (item.JobNo) {
                             const $sel = $row.find('.job-select-jobno');
                             if ($sel.find(`option[value="${item.JobNo}"]`).length === 0) $sel.append(new Option(item.JobNo, item.JobNo));
-                            $sel.val(item.JobNo).trigger('change.jobno');
+                            $sel.val(item.JobNo).trigger('change');
                         }
                         if (item.ProjectName) $row.find('.job-projectname').val(item.ProjectName);
                     });
@@ -1593,6 +1610,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                     card.data('contacts', contacts);
 
                     const updateSelect = ($select, items, key) => {
+                        const prevVals = $select.val() || [];
                         $select.empty();
                         const added = new Set();
                         items.forEach(c => {
@@ -1602,6 +1620,14 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                                 added.add(val);
                             }
                         });
+                        // Re-add previously selected values not in CRM data
+                        prevVals.forEach(v => {
+                            if (v && !added.has(v)) {
+                                $select.append(new Option(v, v, false, false));
+                                added.add(v);
+                            }
+                        });
+                        if (prevVals.length > 0) $select.val(prevVals);
                         $select.trigger('change');
                     };
 
@@ -2190,7 +2216,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                 cacheData.forEach(row => { if (row.PO_No) jobnoPOMap[row.PO_No] = row.Used_For || ''; });
 
                 const $newSelect = $('<select class="form-select job-select-jobno" style="width: 200px; flex-shrink: 0;"></select>');
-                const $newInput = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ (อัตโนมัติ)">');
+                const $newInput = $('<input type="text" class="form-control job-projectname" placeholder="ชื่อโครงการ">');
                 const $removeBtn = $('<button type="button" class="btn btn-outline-danger btn-sm btn-remove-job-row" style="flex-shrink:0;"><i class="ti ti-trash"></i></button>');
 
                 $newSelect.append(new Option('', ''));
@@ -3094,7 +3120,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                 // Disable all inputs
                 $('input, textarea, select').not('#commentText').prop('disabled', true);
                 // Hide add buttons
-                $('.btn-add-job, .btn-add-schedule, #btnAddRow, .removeRow, .upload-area, .removeJobBtn').hide();
+                $('.btn-add-job, .btn-add-job-no, .btn-add-schedule, #btnAddRow, #addSchedule, .removeRow, .btn-remove-job-row, .upload-area, .removeJobBtn').hide();
                 // Disable Select2
                 $('.select2-selection').css('pointer-events', 'none');
             }
@@ -3330,14 +3356,31 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                 ['travel', 'CusFood'].forEach(name => {
                     try {
                         $(`[name='${name}[]']`).prop('checked', false);
-                        let arr = JSON.parse(d[name.charAt(0).toUpperCase() + name.slice(1)] || '[]');
+                        let raw = d[name.charAt(0).toUpperCase() + name.slice(1)] || '[]';
+                        let arr;
+                        try {
+                            arr = JSON.parse(raw);
+                        } catch (e) {
+                            // Handle non-JSON values (plain string)
+                            arr = raw ? [raw] : [];
+                        }
+                        if (!Array.isArray(arr)) arr = [arr];
                         arr.forEach(v => $(`[name='${name}[]'][value='${v}']`).prop('checked', true));
                     } catch (e) {}
                 });
+                // Trigger CusFood change to update food-choice enable/disable state
+                $('input[name="CusFood[]"]:checked').last().trigger('change');
 
                 // กรอกข้อมูลอาหาร (บังคับเลือกชุดเดียว)
                 try {
-                    let foodArr = JSON.parse(d.Food || '[]');
+                    let foodRaw = d.Food || '[]';
+                    let foodArr;
+                    try {
+                        foodArr = JSON.parse(foodRaw);
+                    } catch (e) {
+                        foodArr = foodRaw ? [foodRaw] : [];
+                    }
+                    if (!Array.isArray(foodArr)) foodArr = [foodArr];
 
                     if (foodArr.length > 0) {
                         // 1. หาว่าเมนูที่ save มา อยู่ใน Set ไหนบ้าง
@@ -3609,7 +3652,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                 // Reset Action Bar และแสดง card
                 $actionBar.empty();
                 $('#ack-divisions').empty();
-                $('#acknowledge-status').show();
+                $('#acknowledge-status').hide();
 
                 // Helper for button generation
                 let buttons = '';
