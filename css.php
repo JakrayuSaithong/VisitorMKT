@@ -21,16 +21,324 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
 
 <style>
+    /* =====================================================
+       MODERN DATATABLE STYLING — Material Design 3
+       ===================================================== */
+
+    /* Table card container */
+    .card.card-body.table-responsive,
+    .card.table-wrapper.table-responsive {
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+        padding: 24px !important;
+        background: #f9fafb;
+    }
+
+    /* Table base */
+    .table {
+        border-collapse: separate;
+        border-spacing: 0;
+        margin-bottom: 0;
+        font-size: 14px;
+        color: #374151;
+    }
+
+    /* Header */
     thead {
         border: 0 !important;
     }
 
-    .table th {
-        background-color: #f8fafc !important;
+    .table thead th {
+        background-color: transparent !important;
+        border-bottom: 2px solid #e5e7eb !important;
+        border-top: none !important;
+        padding: 12px 16px !important;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #6b7280;
+        white-space: nowrap;
     }
 
+    /* Body rows */
+    .table tbody td {
+        padding: 14px 16px !important;
+        border-bottom: 1px solid #f3f4f6 !important;
+        vertical-align: middle;
+        transition: background-color 0.15s ease;
+    }
+
+    .table tbody tr {
+        transition: all 0.15s ease;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8faff !important;
+    }
+
+    .table tbody tr:last-child td {
+        border-bottom: none !important;
+    }
+
+    /* Striped effect (subtle) */
+    .table tbody tr:nth-child(even) {
+        background-color: #fafbfc;
+    }
+
+    .table tbody tr:nth-child(even):hover {
+        background-color: #f0f4ff !important;
+    }
+
+    /* DataTables top/bottom controls */
+    div.dt-container {
+        padding: 0;
+    }
+
+    div.dt-container div.dt-layout-row {
+        margin: 0;
+        padding: 0;
+        align-items: center;
+    }
+
+    div.dt-container div.dt-layout-row:first-child {
+        padding-bottom: 20px;
+        border-bottom: 1px solid #f3f4f6;
+        margin-bottom: 0;
+    }
+
+    div.dt-container div.dt-layout-row:last-child {
+        padding-top: 20px;
+        border-top: 1px solid #f3f4f6;
+        margin-top: 0;
+    }
+
+    /* Search input */
+    div.dt-container div.dt-search input {
+        border: 1.5px solid #e5e7eb !important;
+        border-radius: 10px !important;
+        padding: 8px 14px !important;
+        font-size: 13px !important;
+        min-width: 220px;
+        transition: all 0.2s ease;
+        background: #fafafa;
+        outline: none;
+    }
+
+    div.dt-container div.dt-search input:focus {
+        border-color: #007aff !important;
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1) !important;
+        background: #fff;
+    }
+
+    div.dt-container div.dt-search label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #6b7280;
+        gap: 8px;
+    }
+
+    /* Length select */
     div.dt-container div.dt-length select {
-        padding: .5rem 2rem .5rem 1rem !important;
+        border: 1.5px solid #e5e7eb !important;
+        border-radius: 10px !important;
+        padding: 8px 32px 8px 14px !important;
+        font-size: 13px !important;
+        background-color: #fafafa;
+        color: #374151;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+        background-position: right 10px center;
+        background-repeat: no-repeat;
+        background-size: 16px;
+    }
+
+    div.dt-container div.dt-length select:focus {
+        border-color: #007aff !important;
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1) !important;
+        background-color: #fff;
+        outline: none;
+    }
+
+    div.dt-container div.dt-length label {
+        font-size: 13px;
+        font-weight: 500;
+        color: #6b7280;
+        gap: 8px;
+    }
+
+    /* Info text */
+    div.dt-container div.dt-info {
+        font-size: 13px;
+        color: #9ca3af;
+        font-weight: 400;
+        padding-top: 0;
+    }
+
+    /* Pagination */
+    div.dt-container div.dt-paging ul.pagination {
+        gap: 4px;
+        margin: 0;
+    }
+
+    div.dt-container div.dt-paging .page-item .page-link {
+        border: none;
+        border-radius: 10px !important;
+        padding: 8px 14px;
+        font-size: 13px;
+        font-weight: 500;
+        color: #6b7280;
+        background: transparent;
+        transition: all 0.15s ease;
+        min-width: 38px;
+        text-align: center;
+        line-height: 1.4;
+    }
+
+    div.dt-container div.dt-paging .page-item .page-link:hover {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    div.dt-container div.dt-paging .page-item.active .page-link {
+        background: #007aff !important;
+        color: #fff !important;
+        box-shadow: 0 2px 8px rgba(0, 122, 255, 0.25);
+    }
+
+    div.dt-container div.dt-paging .page-item.disabled .page-link {
+        color: #d1d5db;
+        background: transparent;
+    }
+
+    /* Previous/Next buttons */
+    div.dt-container div.dt-paging .page-item:first-child .page-link,
+    div.dt-container div.dt-paging .page-item:last-child .page-link {
+        font-weight: 600;
+    }
+
+    /* Empty/loading state */
+    .table tbody td.text-center.text-muted,
+    .table tbody td.text-center.text-danger {
+        padding: 48px 16px !important;
+        font-size: 14px;
+        color: #9ca3af;
+    }
+
+    /* Badge refinement inside tables */
+    .table .badge {
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        padding: 6px 12px;
+        border-radius: 8px;
+        font-size: 12px !important;
+    }
+
+    /* Action buttons inside tables */
+    .table .btn-sm {
+        border-radius: 8px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        transition: all 0.15s ease;
+        border: none;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    }
+
+    .table .btn-sm:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    }
+
+    .table .btn-sm i {
+        font-size: 14px;
+    }
+
+    /* Responsive: scroll shadow hint */
+    .table-responsive {
+        position: relative;
+    }
+
+    /* No data row */
+    .dataTables_empty {
+        text-align: center !important;
+        color: #9ca3af !important;
+        padding: 48px 16px !important;
+    }
+
+    /* =====================================================
+       PAGE HEADER & TOOLBAR
+       ===================================================== */
+    .d-flex.justify-content-between.py-4 h2.h4 {
+        font-weight: 700;
+        color: #111827;
+        font-size: 22px;
+        letter-spacing: -0.02em;
+    }
+
+    .breadcrumb-item {
+        font-size: 13px;
+    }
+
+    .btn-gray-800 {
+        background: #111827 !important;
+        border: none !important;
+        border-radius: 10px !important;
+        padding: 8px 18px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+    }
+
+    .btn-gray-800:hover {
+        background: #1f2937 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+    }
+
+    /* =====================================================
+       MODAL MODERN STYLING
+       ===================================================== */
+    .modal-content {
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+        overflow: hidden;
+    }
+
+    .modal-header {
+        background: #fafbfc;
+        border-bottom: 1px solid #f3f4f6;
+        padding: 20px 24px;
+    }
+
+    .modal-title {
+        font-weight: 700;
+        font-size: 16px;
+        color: #111827;
+    }
+
+    .modal-body {
+        padding: 24px;
+    }
+
+    .modal-footer {
+        background: #fafbfc;
+        border-top: 1px solid #f3f4f6;
+        padding: 16px 24px;
+        gap: 8px;
+    }
+
+    .modal-footer .btn {
+        border-radius: 10px;
+        padding: 8px 20px;
+        font-size: 13px;
+        font-weight: 600;
+        transition: all 0.2s ease;
     }
 
     .upload-area {
