@@ -343,7 +343,6 @@
 
             Swal.fire({
                 title: 'กำลังส่งข้อมูล...',
-                text: 'โปรดรอสักครู่',
                 allowOutsideClick: false,
                 didOpen: () => Swal.showLoading()
             });

@@ -191,10 +191,10 @@
             Swal.fire({
                 title: 'ยืนยันการบันทึก?',
                 text: "ยืนยันการบันทึก",
-                icon: 'warning',
+                icon: 'question',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                cancelButtonColor: '#6B7280',
                 confirmButtonText: 'ยืนยัน',
                 cancelButtonText: 'ยกเลิก'
             }).then((result) => {
@@ -210,7 +210,6 @@
                         beforeSend: function() {
                             Swal.fire({
                                 title: 'กำลังบันทึกข้อมูล...',
-                                text: 'โปรดรอสักครู่',
                                 allowOutsideClick: false,
                                 didOpen: () => {
                                     Swal.showLoading();

@@ -1882,7 +1882,6 @@ include_once 'config/base.php';
             }
             Swal.fire({
                 title: 'กำลังโหลดข้อมูล...',
-                text: 'โปรดรอสักครู่',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -2464,7 +2463,6 @@ include_once 'config/base.php';
                         beforeSend: function() {
                             Swal.fire({
                                 title: 'กำลังส่งข้อมูล...',
-                                text: 'โปรดรอสักครู่',
                                 allowOutsideClick: false,
                                 didOpen: () => Swal.showLoading()
                             });

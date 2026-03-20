@@ -1494,7 +1494,6 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
             try {
                 Swal.fire({
                     title: 'กำลังโหลดข้อมูล...',
-                    text: 'โปรดรอสักครู่',
                     allowOutsideClick: false,
                     didOpen: () => {
                         Swal.showLoading();
@@ -1791,7 +1790,6 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                     const jobno = $('#JobNo').val();
                     Swal.fire({
                         title: 'กำลังโหลดข้อมูล...',
-                        text: 'โปรดรอสักครู่',
                         allowOutsideClick: false,
                         didOpen: () => Swal.showLoading()
                     });
@@ -2426,7 +2424,6 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                         beforeSend: function() {
                             Swal.fire({
                                 title: 'กำลังส่งข้อมูล...',
-                                text: 'โปรดรอสักครู่',
                                 allowOutsideClick: false,
                                 didOpen: () => Swal.showLoading()
                             });

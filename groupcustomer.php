@@ -166,10 +166,10 @@
                 Swal.fire({
                     title: 'ต้องการบันทึกข้อมูลใช่หรือไม่',
                     text: "ยืนยันการบันทึก",
-                    icon: 'warning',
+                    icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
+                    cancelButtonColor: '#6B7280',
                     confirmButtonText: 'ยืนยัน',
                     cancelButtonText: 'ยกเลิก'
                 }).then((result) => {
@@ -184,7 +184,6 @@
                             beforeSend: function() {
                                 Swal.fire({
                                     title: 'กำลังบันทึกข้อมูล...',
-                                    text: 'โปรดรอสักครู่',
                                     allowOutsideClick: false,
                                     didOpen: () => {
                                         Swal.showLoading();
@@ -249,10 +248,10 @@
                 Swal.fire({
                     title: 'ต้องการบันทึกข้อมูลใช่หรือไม่',
                     text: "ยืนยันการบันทึก",
-                    icon: 'warning',
+                    icon: 'question',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
+                    cancelButtonColor: '#6B7280',
                     confirmButtonText: 'ยืนยัน',
                     cancelButtonText: 'ยกเลิก'
                 }).then((result) => {
@@ -269,7 +268,6 @@
                             beforeSend: function() {
                                 Swal.fire({
                                     title: 'กำลังบันทึกข้อมูล...',
-                                    text: 'โปรดรอสักครู่',
                                     allowOutsideClick: false,
                                     didOpen: () => {
                                         Swal.showLoading();
@@ -348,7 +346,7 @@
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
+                cancelButtonColor: '#6B7280',
                 confirmButtonText: 'ยืนยัน',
                 cancelButtonText: 'ยกเลิก'
             }).then((result) => {

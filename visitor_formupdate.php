@@ -1995,7 +1995,6 @@ endif; ?>
             }
             Swal.fire({
                 title: 'กำลังโหลดข้อมูล...',
-                text: 'โปรดรอสักครู่',
                 allowOutsideClick: false,
                 didOpen: () => {
                     Swal.showLoading();
@@ -2478,7 +2477,6 @@ endif; ?>
                         beforeSend: function() {
                             Swal.fire({
                                 title: 'กำลังส่งข้อมูล...',
-                                text: 'โปรดรอสักครู่',
                                 allowOutsideClick: false,
                                 didOpen: () => Swal.showLoading()
                             });

@@ -169,6 +169,7 @@ include_once 'config/base.php';
                 showCancelButton: true,
                 confirmButtonText: 'คัดลอก',
                 cancelButtonText: 'ยกเลิก',
+                cancelButtonColor: '#6B7280',
                 reverseButtons: true
             }).then((result) => {
                 if (result.isConfirmed) {
