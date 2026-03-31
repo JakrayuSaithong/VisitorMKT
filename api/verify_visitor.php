@@ -62,7 +62,7 @@ try {
     }
 
     // Get VisitorForm with SalesDetail and VisitorSchedule (SQL Server)
-    $sql = "SELECT vf.SalesDetail, vs.VisitDate, vs.TimeStart, vs.TimeEnd
+    $sql = "SELECT vf.SalesDetail, vf.UserCreated, vs.VisitDate, vs.TimeStart, vs.TimeEnd
             FROM VisitorForm vf
             LEFT JOIN VisitorSchedule vs ON vs.VisitorFormId = vf.Id
             WHERE vf.Id = ?";
@@ -184,10 +184,10 @@ try {
         $visitDate = $dt->format('j') . ' ' . $thaiMonths[(int)$dt->format('n')] . ' ' . ($dt->format('Y') + 543);
     }
 
-    // ดึง SalesName จาก mydata function
-    $salesId = isset($job['SalesName']) ? $job['SalesName'] : '';
-    $salesData = $salesId ? mydata($salesId) : null;
-    $salesName = ($salesData && isset($salesData['FullName'])) ? $salesData['FullName'] : 'ทีมงาน ASEFA';
+    // ดึงชื่อผู้ร้องขอ (UserCreated) จาก mydata
+    $requesterCode = isset($data['UserCreated']) ? $data['UserCreated'] : '';
+    $requesterData = $requesterCode ? mydata($requesterCode) : null;
+    $salesName = ($requesterData && isset($requesterData['FullName'])) ? $requesterData['FullName'] : 'ทีมงาน ASEFA';
 
     echo json_encode(array(
         'success' => true,
