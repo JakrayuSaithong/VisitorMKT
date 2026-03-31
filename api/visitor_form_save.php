@@ -100,14 +100,46 @@ try {
                 $visitDate = !empty($s['date'])
                     ? DateTime::createFromFormat('d/m/Y', $s['date'])->format('Y-m-d')
                     : null;
+                $subject   = $s['subject'] ?? '';
+                $timeStart = $s['time_start'] ?? '';
+                $timeEnd   = $s['time_end'] ?? '';
+                $roomId    = $s['room'] ?? null;
 
                 $sql2 = "INSERT INTO VisitorSchedule
-                         (VisitorFormId, ReserveType, VisitDate, TimeStart, TimeEnd, MeetingRoom, MeetingName)
-                         VALUES (?, ?, ?, ?, ?, ?, ?)";
-                $params2 = [$visitorId, $s['reserve'] ?? null, $visitDate, $s['time_start'] ?? null, $s['time_end'] ?? null, $s['room'] ?? null, $s['roomname'] ?? null];
+                         (VisitorFormId, ReserveType, VisitDate, TimeStart, TimeEnd, MeetingRoom, MeetingName, Subject)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                $params2 = [$visitorId, $s['reserve'] ?? null, $visitDate, $timeStart, $timeEnd, $roomId, $s['roomname'] ?? null, $subject];
 
                 if (!sqlsrv_query($konnext_DB64, $sql2, $params2)) {
                     throw new Exception("ไม่สามารถบันทึกตารางเวลาได้: " . print_r(sqlsrv_errors(), true));
+                }
+
+                // Insert into work_progress_091 (MySQL rypsoftcom_erp2)
+                if ($visitDate && $timeStart && $timeEnd && $roomId) {
+                    $startDatetime = $visitDate . ' ' . $timeStart . ':00';
+                    $endDatetime   = $visitDate . ' ' . $timeEnd   . ':00';
+                    $startTs  = strtotime($startDatetime);
+                    $endTs    = strtotime($endDatetime);
+                    $duration = ($startTs !== false && $endTs !== false && $endTs > $startTs) ? ($endTs - $startTs) : 0;
+                    $bookingStatus = 'Meeting';
+
+                    $sqlErp = "INSERT INTO work_progress_091
+                        (site_f_1133, site_f_3892, site_f_1171, site_f_1172, site_f_1134,
+                         site_f_1173, site_f_1174, site_f_1175, site_f_1135, site_f_1136,
+                         site_f_1209, site_f_1210, site_f_3567)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)";
+                    $stmtErp = mysqli_prepare($konnext_lqsym, $sqlErp);
+                    if (!$stmtErp) {
+                        throw new Exception("ไม่สามารถเตรียม SQL สำหรับ work_progress_091: " . mysqli_error($konnext_lqsym));
+                    }
+                    mysqli_stmt_bind_param($stmtErp, 'sssssssssssi',
+                        $subject, $bookingStatus, $visitDate, $timeStart, $startDatetime,
+                        $visitDate, $timeEnd, $endDatetime,
+                        $roomId, $VisitorCode, $VisitorCode, $duration);
+                    if (!mysqli_stmt_execute($stmtErp)) {
+                        throw new Exception("ไม่สามารถบันทึก work_progress_091: " . mysqli_stmt_error($stmtErp));
+                    }
+                    mysqli_stmt_close($stmtErp);
                 }
             }
         }

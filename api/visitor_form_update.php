@@ -3,6 +3,9 @@ include_once '../config/base.php';
 header('Content-Type: application/json; charset=utf-8');
 
 try {
+    if (!$konnext_DB64) {
+        throw new Exception("ไม่สามารถเชื่อมต่อฐานข้อมูลได้");
+    }
     sqlsrv_begin_transaction($konnext_DB64);
 
     $VisitorCode = $_SESSION['VisitorMKT_code'] ?? 'SYSTEM';
@@ -122,24 +125,89 @@ try {
 
     // --- ตาราง schedule และไฟล์ (เฉพาะ Full form update) ---
     if (!$isCommentOnly) {
+    // ดึงข้อมูล schedule เดิมก่อนลบ เพื่อใช้ลบ work_progress_091
+    $existingSchedules = [];
+    $sqlGetSched = "SELECT ReserveType, VisitDate, TimeStart, MeetingRoom FROM VisitorSchedule WHERE VisitorFormId = ?";
+    $stmtGetSched = sqlsrv_query($konnext_DB64, $sqlGetSched, [$id]);
+    if ($stmtGetSched) {
+        while ($r = sqlsrv_fetch_array($stmtGetSched, SQLSRV_FETCH_ASSOC)) {
+            $existingSchedules[] = $r;
+        }
+    }
+
     $sqlDeleteSchedule = "DELETE FROM VisitorSchedule WHERE VisitorFormId = ?";
     sqlsrv_query($konnext_DB64, $sqlDeleteSchedule, [$id]);
+
+    // ลบรายการจอง work_progress_091 ที่ตรงกับ schedule เดิม
+    foreach ($existingSchedules as $es) {
+        $esDate = null;
+        if (!empty($es['VisitDate'])) {
+            $esDate = ($es['VisitDate'] instanceof DateTime)
+                ? $es['VisitDate']->format('Y-m-d')
+                : date('Y-m-d', strtotime($es['VisitDate']));
+        }
+        $esTimeStart = $es['TimeStart'] ?? null;
+        $esRoom      = $es['MeetingRoom'] ?? null;
+        if ($esDate && $esTimeStart && $esRoom) {
+            $sqlDelErp = "DELETE FROM work_progress_091 WHERE site_f_1135 = ? AND DATE(site_f_1134) = ? AND TIME(site_f_1134) = ?";
+            $stmtDelErp = mysqli_prepare($konnext_lqsym, $sqlDelErp);
+            if ($stmtDelErp) {
+                mysqli_stmt_bind_param($stmtDelErp, 'sss', $esRoom, $esDate, $esTimeStart);
+                mysqli_stmt_execute($stmtDelErp);
+                mysqli_stmt_close($stmtDelErp);
+            }
+        }
+    }
 
     if (!empty($_POST['schedule'])) {
         $schedules = json_decode($_POST['schedule'], true);
         if (is_array($schedules)) {
             foreach ($schedules as $s) {
-                $visitDate = !empty($s['date'])
-                    ? DateTime::createFromFormat('d/m/Y', $s['date'])->format('Y-m-d')
-                    : null;
+                $visitDate = null;
+                if (!empty($s['date'])) {
+                    $dt = DateTime::createFromFormat('d/m/Y', $s['date']);
+                    $visitDate = $dt ? $dt->format('Y-m-d') : null;
+                }
+                $subject   = $s['subject'] ?? '';
+                $timeStart = $s['time_start'] ?? '';
+                $timeEnd   = $s['time_end'] ?? '';
+                $roomId    = $s['room'] ?? null;
 
                 $sql2 = "INSERT INTO VisitorSchedule
-                         (VisitorFormId, ReserveType, VisitDate, TimeStart, TimeEnd, MeetingRoom, MeetingName)
-                         VALUES (?, ?, ?, ?, ?, ?, ?)";
-                $params2 = [$id, $s['reserve'] ?? null, $visitDate, $s['time_start'] ?? null, $s['time_end'] ?? null, $s['room'] ?? null, $s['roomname'] ?? null];
+                         (VisitorFormId, ReserveType, VisitDate, TimeStart, TimeEnd, MeetingRoom, MeetingName, Subject)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                $params2 = [$id, $s['reserve'] ?? null, $visitDate, $timeStart, $timeEnd, $roomId, $s['roomname'] ?? null, $subject];
 
                 if (!sqlsrv_query($konnext_DB64, $sql2, $params2)) {
                     throw new Exception("ไม่สามารถบันทึกตารางเวลาได้: " . print_r(sqlsrv_errors(), true));
+                }
+
+                // Insert into work_progress_091 (MySQL rypsoftcom_erp2)
+                if ($visitDate && $timeStart && $timeEnd && $roomId) {
+                    $startDatetime = $visitDate . ' ' . $timeStart . ':00';
+                    $endDatetime   = $visitDate . ' ' . $timeEnd   . ':00';
+                    $startTs  = strtotime($startDatetime);
+                    $endTs    = strtotime($endDatetime);
+                    $duration = ($startTs !== false && $endTs !== false && $endTs > $startTs) ? ($endTs - $startTs) : 0;
+                    $bookingStatus = 'Meeting';
+
+                    $sqlErp = "INSERT INTO work_progress_091
+                        (site_f_1133, site_f_3892, site_f_1171, site_f_1172, site_f_1134,
+                         site_f_1173, site_f_1174, site_f_1175, site_f_1135, site_f_1136,
+                         site_f_1209, site_f_1210, site_f_3567)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)";
+                    $stmtErp = mysqli_prepare($konnext_lqsym, $sqlErp);
+                    if (!$stmtErp) {
+                        throw new Exception("ไม่สามารถเตรียม SQL สำหรับ work_progress_091: " . mysqli_error($konnext_lqsym));
+                    }
+                    mysqli_stmt_bind_param($stmtErp, 'sssssssssssi',
+                        $subject, $bookingStatus, $visitDate, $timeStart, $startDatetime,
+                        $visitDate, $timeEnd, $endDatetime,
+                        $roomId, $VisitorCode, $VisitorCode, $duration);
+                    if (!mysqli_stmt_execute($stmtErp)) {
+                        throw new Exception("ไม่สามารถบันทึก work_progress_091: " . mysqli_stmt_error($stmtErp));
+                    }
+                    mysqli_stmt_close($stmtErp);
                 }
             }
         }
@@ -226,7 +294,9 @@ try {
 
     sqlsrv_commit($konnext_DB64);
     echo json_encode(["status" => true, "message" => "บันทึกข้อมูลแก้ไขสำเร็จ"]);
-} catch (Exception $e) {
-    sqlsrv_rollback($konnext_DB64);
+} catch (\Throwable $e) {
+    if ($konnext_DB64) {
+        sqlsrv_rollback($konnext_DB64);
+    }
     echo json_encode(["status" => false, "message" => $e->getMessage()]);
 }

@@ -107,10 +107,20 @@ include_once 'config/base.php';
 
 
 
-        #table-schedule th {
-            background-color: #007aff !important;
-            color: white;
-            border: 2px solid #007aff !important;
+        .schedule-card {
+            background: #fff;
+            border: 1.5px solid #d1d5db;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06);
+            transition: box-shadow .2s;
+        }
+        .schedule-card:hover { box-shadow: 0 3px 10px rgba(99,102,241,.12); }
+        .schedule-card .schedule-label {
+            font-size: .72rem;
+            color: #6b7280;
+            margin-bottom: 2px;
         }
 
         #FoodTable th {
@@ -626,45 +636,51 @@ include_once 'config/base.php';
                         </div>
                     </div>
 
-                    <div class="col-sm-12 table-responsive">
-                        <table class="table table-hover border border-2" id="table-schedule">
-                            <thead>
-                                <tr>
-                                    <th>การจอง</th>
-                                    <th>วันที่เยี่ยม</th>
-                                    <th>เวลาเยี่ยม</th>
-                                    <th>ถึงเวลา</th>
-                                    <th>ห้องประชุม</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white">
-                                <tr>
-                                    <td>
+                    <div id="schedule-container">
+                        <div class="schedule-card">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-md-4">
+                                    <div class="schedule-label">ประเภท</div>
+                                    <div class="input-group">
+                                        <span class="input-group-text reserve-icon px-2" style="background:#6366f1;color:white;transition:background .2s">
+                                            <i class="ti ti-building fs-5"></i>
+                                        </span>
                                         <select class="form-select reserve">
-                                            <option value="meeting">จองห้องประชุม</option>
-                                            <option value="zoom">จอง Zoom</option>
+                                            <option value="meeting">ห้องประชุม</option>
+                                            <option value="zoom">Zoom</option>
                                         </select>
-                                    </td>
-                                    <td width="250">
-                                        <div class="input-group" style="width: 200px !important;">
-                                            <span class="input-group-text">
-                                                📅
-                                            </span>
-                                            <input class="form-control dateTrival" name="dateTrival[]" type="text" placeholder="dd/mm/yyyy" required>
-                                        </div>
-                                    </td>
-                                    <td><input type="time" class="form-control" name="meeting_time_start[]" value="08:30"></td>
-                                    <td><input type="time" class="form-control" name="meeting_time_end[]" value="23:30"></td>
-                                    <td>
-                                        <select name="meetingroom[]" class="form-select meetingroom">
-
-                                        </select>
-                                    </td>
-                                    <td class="text-center"><button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5 me-2"></i>ลบ</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-7">
+                                    <div class="schedule-label">หัวข้อการประชุม</div>
+                                    <input type="text" class="form-control" name="meeting_subject[]" placeholder="หัวข้อการประชุม">
+                                </div>
+                                <div class="col-12 col-md-1 text-end">
+                                    <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="schedule-label">วันที่เยี่ยม</div>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="ti ti-calendar fs-5"></i></span>
+                                        <input class="form-control dateTrival" name="dateTrival[]" type="text" placeholder="dd/mm/yyyy" required>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-2">
+                                    <div class="schedule-label">เวลาเริ่ม</div>
+                                    <input type="time" class="form-control" name="meeting_time_start[]" value="08:30" min="08:30" max="17:30">
+                                </div>
+                                <div class="col-6 col-md-2">
+                                    <div class="schedule-label">ถึงเวลา</div>
+                                    <input type="time" class="form-control" name="meeting_time_end[]" value="17:30" min="08:30" max="17:30">
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="schedule-label">ห้อง / Zoom</div>
+                                    <select name="meetingroom[]" class="form-select meetingroom">
+                                        <option value="">-- เลือกเวลาก่อน --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1078,7 +1094,7 @@ include_once 'config/base.php';
                 <!-- Tab PRD (วางแผน) -->
                 <div class="tab-pane fade" id="nav-prd" role="tabpanel" aria-labelledby="nav-prd-tab" tabindex="0">
                     <div class="card border border-2 table-wrapper table-responsive">
-                        <h6 class="card-header py-3" style="background-color: #10B981; color: white;">ฝ่ายวางแผน (PRD)</h6>
+                        <h6 class="card-header py-3" style="background-color: #10B981; color: white;">ฝ่ายวางแผน</h6>
                         <div class="card-body">
                             <div class="row mb-3">
                                 <div class="col-12">
@@ -1100,7 +1116,7 @@ include_once 'config/base.php';
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label class="col-sm-2 col-form-label">หมายเหตุ PRD</label>
+                                <label class="col-sm-2 col-form-label">หมายเหตุ</label>
                                 <div class="col-sm-10">
                                     <textarea class="form-control" id="prdRemark" rows="3" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
                                 </div>
@@ -2006,34 +2022,56 @@ include_once 'config/base.php';
             });
 
             $('#addSchedule').on('click', function() {
-                let newRow = $(`
-                    <tr>
-                        <td>
-                            <select class="form-select reserve">
-                                <option value="meeting">จองห้องประชุม</option>
-                                <option value="zoom">จอง Zoom</option>
-                            </select>
-                        </td>
-                        <td width="250">
-                            <div class="input-group" style="width: 200px !important;">
-                                <span class="input-group-text">📅</span>
-                                <input class="form-control dateTrival" name="dateTrival[]" type="text" placeholder="dd/mm/yyyy" required>
+                let newCard = $(`
+                    <div class="schedule-card">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-12 col-md-4">
+                                <div class="schedule-label">ประเภท</div>
+                                <div class="input-group">
+                                    <span class="input-group-text reserve-icon px-2" style="background:#6366f1;color:white;transition:background .2s">
+                                        <i class="ti ti-building fs-5"></i>
+                                    </span>
+                                    <select class="form-select reserve">
+                                        <option value="meeting">ห้องประชุม</option>
+                                        <option value="zoom">Zoom</option>
+                                    </select>
+                                </div>
                             </div>
-                        </td>
-                        <td><input type="time" class="form-control" name="meeting_time_start[]" value="08:30"></td>
-                        <td><input type="time" class="form-control" name="meeting_time_end[]" value="23:30"></td>
-                        <td>
-                            <select name="meetingroom[]" class="form-select meetingroom">
-                                
-                            </select>
-                        </td>
-                        <td class="text-center"><button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5 me-2"></i>ลบ</button></td>
-                    </tr>
+                            <div class="col-12 col-md-7">
+                                <div class="schedule-label">หัวข้อการประชุม</div>
+                                <input type="text" class="form-control" name="meeting_subject[]" placeholder="หัวข้อการประชุม">
+                            </div>
+                            <div class="col-12 col-md-1 text-end">
+                                <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="schedule-label">วันที่เยี่ยม</div>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="ti ti-calendar fs-5"></i></span>
+                                    <input class="form-control dateTrival" name="dateTrival[]" type="text" placeholder="dd/mm/yyyy" required>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <div class="schedule-label">เวลาเริ่ม</div>
+                                <input type="time" class="form-control" name="meeting_time_start[]" value="08:30" min="08:30" max="17:30">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <div class="schedule-label">ถึงเวลา</div>
+                                <input type="time" class="form-control" name="meeting_time_end[]" value="17:30" min="08:30" max="17:30">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="schedule-label">ห้อง / Zoom</div>
+                                <select name="meetingroom[]" class="form-select meetingroom">
+                                    <option value="">-- เลือกเวลาก่อน --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 `);
 
-                $('#table-schedule tbody').append(newRow);
+                $('#schedule-container').append(newCard);
 
-                newRow.find('.dateTrival').datepicker({
+                newCard.find('.dateTrival').datepicker({
                     dateFormat: 'dd/mm/yy',
                     appendTo: 'body',
                     minDate: 0
@@ -2041,7 +2079,7 @@ include_once 'config/base.php';
             });
 
             $(document).on('click', '.removeRow', function() {
-                $(this).closest('tr').remove();
+                $(this).closest('.schedule-card').remove();
             });
 
             $('#showroom_3').on('change', function() {
@@ -2310,9 +2348,22 @@ include_once 'config/base.php';
             });
         });
 
-        $(document).on('change', '.reserve, .dateTrival, input[name="meeting_time_start[]"], input[name="meeting_time_end[]"]', function() {
-            let row = $(this).closest('tr');
-            loadMeetingRoom(row);
+        $(document).on('change', '.reserve', function() {
+            const card = $(this).closest('.schedule-card');
+            const span = card.find('.reserve-icon');
+            if ($(this).val() === 'zoom') {
+                span.find('i').removeClass('ti-building').addClass('ti-video');
+                span.css('background', '#0ea5e9');
+            } else {
+                span.find('i').removeClass('ti-video').addClass('ti-building');
+                span.css('background', '#6366f1');
+            }
+            loadMeetingRoom(card);
+        });
+
+        $(document).on('change', '.dateTrival, input[name="meeting_time_start[]"], input[name="meeting_time_end[]"]', function() {
+            let card = $(this).closest('.schedule-card');
+            loadMeetingRoom(card);
         });
 
         async function get_objective_list() {
@@ -2427,10 +2478,11 @@ include_once 'config/base.php';
             });
 
             let schedule = [];
-            $('#table-schedule tbody tr').each(function() {
-                if ($(this).find('.meetingroom').val() == null) return;
+            $('#schedule-container .schedule-card').each(function() {
+                if (!$(this).find('.meetingroom').val()) return;
                 schedule.push({
                     reserve: $(this).find('.reserve').val(),
+                    subject: $(this).find('input[name="meeting_subject[]"]').val(),
                     date: $(this).find('.dateTrival').val(),
                     time_start: $(this).find('input[name="meeting_time_start[]"]').val(),
                     time_end: $(this).find('input[name="meeting_time_end[]"]').val(),
@@ -2472,59 +2524,12 @@ include_once 'config/base.php';
                             let response = typeof res === "string" ? JSON.parse(res) : res;
 
                             if (response.status) {
-                                if (!schedule || schedule.length === 0) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'สำเร็จ',
-                                        text: response.message
-                                    }).then(() => {
-                                        window.location.href = './listvisitor.php?page=listvisitor';
-                                    });
-                                    return;
-                                }
-
-                                const ajaxCalls = schedule.map(s => {
-                                    const parts = s.date.split('/');
-                                    const newDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-                                    return $.ajax({
-                                        url: 'https://it.asefa.co.th/Zoompoo/functionPost.php',
-                                        type: 'POST',
-                                        data: {
-                                            'function': 'insertMeetingLog_Pdew',
-                                            'id': s.room,
-                                            'user_id': '',
-                                            'start_time': s.time_start,
-                                            'end_time': s.time_end,
-                                            'Subject': 'จองห้องประชุม',
-                                            'date_filter': newDate
-                                        }
-                                    }).then(
-                                        res => {
-                                            const r = typeof res === 'string' ? JSON.parse(res) : res;
-                                            return r.status === '1';
-                                        },
-                                        () => false
-                                    );
-                                });
-
-                                Promise.all(ajaxCalls).then(results => {
-                                    const allSuccess = results.every(r => r === true);
-
-                                    if (allSuccess) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'สำเร็จ',
-                                            text: response.message
-                                        }).then(() => {
-                                            window.location.href = './listvisitor.php?page=listvisitor';
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'ผิดพลาด',
-                                            text: 'ไม่สามารถจองห้องประชุมได้'
-                                        });
-                                    }
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'สำเร็จ',
+                                    text: response.message
+                                }).then(() => {
+                                    window.location.href = './listvisitor.php?page=listvisitor';
                                 });
                             } else {
                                 Swal.fire({
@@ -2549,49 +2554,40 @@ include_once 'config/base.php';
             });
         }
 
-        function loadMeetingRoom(row) {
-            let reserve = row.find('.reserve').val();
-            let dateTrival = row.find('.dateTrival').val();
-            let timeStart = row.find('input[name="meeting_time_start[]"]').val();
-            let timeEnd = row.find('input[name="meeting_time_end[]"]').val();
+        function loadMeetingRoom(card, selectedValue = null) {
+            let reserve = card.find('.reserve').val();
+            let dateTrival = card.find('.dateTrival').val();
+            let timeStart = card.find('input[name="meeting_time_start[]"]').val();
+            let timeEnd = card.find('input[name="meeting_time_end[]"]').val();
+            const select = card.find('.meetingroom');
 
             if (reserve && dateTrival && timeStart && timeEnd) {
-                let apiUrl = (reserve === 'meeting') ?
-                    'https://it.asefa.co.th/Zoompoo/check_room.php' :
-                    './api/check_zoom.php';
+                select.html('<option value="">กำลังโหลด...</option>').prop('disabled', true);
 
                 $.ajax({
-                    url: apiUrl,
+                    url: './api/check_available_room.php',
                     type: 'POST',
                     data: {
-                        type: reserve,
-                        booking_date: formatDateToYMD(dateTrival),
-                        time_start: timeStart,
-                        time_end: timeEnd
+                        reserve: reserve,
+                        dateTrival: formatDateToYMD(dateTrival),
+                        meeting_time_start: timeStart,
+                        meeting_time_end: timeEnd
                     },
                     dataType: 'json',
-                    success: async function(response) {
-                        console.log(response);
-                        let select = row.find('.meetingroom');
-
-                        select.empty();
+                    success: function(response) {
+                        select.empty().prop('disabled', false);
                         select.append('<option value="">-- เลือกห้อง --</option>');
-
-                        if (response.data) {
-                            for (let item of Object.values(response.data)) {
-                                select.append(`<option value="${item.id_pk}">${item.room_name}</option>`);
-                            }
+                        if (response.status && response.data && response.data.length > 0) {
+                            response.data.forEach(item => {
+                                select.append(`<option value="${item.id}">${item.name}</option>`);
+                            });
+                        } else {
+                            select.append('<option value="" disabled>ไม่มีห้องว่างในช่วงเวลานี้</option>');
                         }
-
-                        if (select[0].tomselect) {
-                            select[0].tomselect.destroy();
-                        }
-                        // new TomSelect(select[0], {
-                        //     allowEmptyOption: true,
-                        //     // dropdownParent: 'body'
-                        // });
+                        if (selectedValue) select.val(selectedValue);
                     },
                     error: function(xhr, status, error) {
+                        select.html('<option value="">เกิดข้อผิดพลาด</option>').prop('disabled', false);
                         console.error("API error:", error);
                     }
                 });

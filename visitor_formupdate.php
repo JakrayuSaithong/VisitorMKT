@@ -111,10 +111,20 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
 
 
 
-        #table-schedule th {
-            background-color: #007aff !important;
-            color: white;
-            border: 2px solid #007aff !important;
+        .schedule-card {
+            background: #fff;
+            border: 1.5px solid #d1d5db;
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 4px rgba(0,0,0,.06);
+            transition: box-shadow .2s;
+        }
+        .schedule-card:hover { box-shadow: 0 3px 10px rgba(99,102,241,.12); }
+        .schedule-card .schedule-label {
+            font-size: .72rem;
+            color: #6b7280;
+            margin-bottom: 2px;
         }
 
         #FoodTable th {
@@ -654,45 +664,51 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                         </div>
                     </div>
 
-                    <div class="col-sm-12 table-responsive">
-                        <table class="table table-hover border border-2" id="table-schedule">
-                            <thead>
-                                <tr>
-                                    <th>การจอง</th>
-                                    <th>วันที่เยี่ยม</th>
-                                    <th>เวลาเยี่ยม</th>
-                                    <th>ถึงเวลา</th>
-                                    <th>ห้องประชุม</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white">
-                                <tr>
-                                    <td>
+                    <div id="schedule-container">
+                        <div class="schedule-card">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-md-4">
+                                    <div class="schedule-label">ประเภท</div>
+                                    <div class="input-group">
+                                        <span class="input-group-text reserve-icon px-2" style="background:#6366f1;color:white;transition:background .2s">
+                                            <i class="ti ti-building fs-5"></i>
+                                        </span>
                                         <select class="form-select reserve">
-                                            <option value="meeting">จองห้องประชุม</option>
-                                            <option value="zoom">จอง Zoom</option>
+                                            <option value="meeting">ห้องประชุม</option>
+                                            <option value="zoom">Zoom</option>
                                         </select>
-                                    </td>
-                                    <td width="250">
-                                        <div class="input-group" style="width: 200px !important;">
-                                            <span class="input-group-text">
-                                                📅
-                                            </span>
-                                            <input class="form-control dateTrival" name="dateTrival[]" type="text" placeholder="dd/mm/yyyy" required>
-                                        </div>
-                                    </td>
-                                    <td><input type="time" class="form-control" name="meeting_time_start[]" value="08:30"></td>
-                                    <td><input type="time" class="form-control" name="meeting_time_end[]" value="23:30"></td>
-                                    <td>
-                                        <select name="meetingroom[]" class="form-select meetingroom">
-
-                                        </select>
-                                    </td>
-                                    <td class="text-center"><button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5 me-2"></i>ลบ</button></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-md-7">
+                                    <div class="schedule-label">หัวข้อการประชุม</div>
+                                    <input type="text" class="form-control" name="meeting_subject[]" placeholder="หัวข้อการประชุม">
+                                </div>
+                                <div class="col-12 col-md-1 text-end">
+                                    <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="schedule-label">วันที่เยี่ยม</div>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="ti ti-calendar fs-5"></i></span>
+                                        <input class="form-control dateTrival" name="dateTrival[]" type="text" placeholder="dd/mm/yyyy" required>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-2">
+                                    <div class="schedule-label">เวลาเริ่ม</div>
+                                    <input type="time" class="form-control" name="meeting_time_start[]" value="08:30" min="08:30" max="17:30">
+                                </div>
+                                <div class="col-6 col-md-2">
+                                    <div class="schedule-label">ถึงเวลา</div>
+                                    <input type="time" class="form-control" name="meeting_time_end[]" value="17:30" min="08:30" max="17:30">
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="schedule-label">ห้อง / Zoom</div>
+                                    <select name="meetingroom[]" class="form-select meetingroom">
+                                        <option value="">-- เลือกเวลาก่อน --</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -1106,7 +1122,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                 <!-- Tab PRD (วางแผน) -->
                 <div class="tab-pane fade" id="nav-prd" role="tabpanel" aria-labelledby="nav-prd-tab" tabindex="0">
                     <div class="card border border-2 table-wrapper table-responsive">
-                        <h6 class="card-header py-3" style="background-color: #10B981; color: white;">ฝ่ายวางแผน (PRD)</h6>
+                        <h6 class="card-header py-3" style="background-color: #10B981; color: white;">ฝ่ายวางแผน</h6>
                         <div class="card-body">
                             <div class="row mb-3">
                                 <div class="col-12">
@@ -1128,7 +1144,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                                 </div>
                             </div>
                             <div class="row mb-3">
-                                <label class="col-sm-2 col-form-label">หมายเหตุ PRD</label>
+                                <label class="col-sm-2 col-form-label">หมายเหตุ</label>
                                 <div class="col-sm-10">
                                     <textarea class="form-control prd-field" id="prdRemark" rows="3" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
                                 </div>
@@ -2118,34 +2134,56 @@ endif; ?>
             });
 
             $('#addSchedule').on('click', function() {
-                let newRow = $(`
-                    <tr>
-                        <td>
-                            <select class="form-select reserve">
-                                <option value="meeting">จองห้องประชุม</option>
-                                <option value="zoom">จอง Zoom</option>
-                            </select>
-                        </td>
-                        <td width="250">
-                            <div class="input-group" style="width: 200px !important;">
-                                <span class="input-group-text">📅</span>
-                                <input class="form-control dateTrival" name="dateTrival[]" type="text" placeholder="dd/mm/yyyy" required>
+                let newCard = $(`
+                    <div class="schedule-card">
+                        <div class="row g-2 align-items-end">
+                            <div class="col-12 col-md-4">
+                                <div class="schedule-label">ประเภท</div>
+                                <div class="input-group">
+                                    <span class="input-group-text reserve-icon px-2" style="background:#6366f1;color:white;transition:background .2s">
+                                        <i class="ti ti-building fs-5"></i>
+                                    </span>
+                                    <select class="form-select reserve">
+                                        <option value="meeting">ห้องประชุม</option>
+                                        <option value="zoom">Zoom</option>
+                                    </select>
+                                </div>
                             </div>
-                        </td>
-                        <td><input type="time" class="form-control" name="meeting_time_start[]" value="08:30"></td>
-                        <td><input type="time" class="form-control" name="meeting_time_end[]" value="23:30"></td>
-                        <td>
-                            <select name="meetingroom[]" class="form-select meetingroom">
-                                
-                            </select>
-                        </td>
-                        <td class="text-center"><button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5 me-2"></i>ลบ</button></td>
-                    </tr>
+                            <div class="col-12 col-md-7">
+                                <div class="schedule-label">หัวข้อการประชุม</div>
+                                <input type="text" class="form-control" name="meeting_subject[]" placeholder="หัวข้อการประชุม">
+                            </div>
+                            <div class="col-12 col-md-1 text-end">
+                                <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="schedule-label">วันที่เยี่ยม</div>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="ti ti-calendar fs-5"></i></span>
+                                    <input class="form-control dateTrival" name="dateTrival[]" type="text" placeholder="dd/mm/yyyy" required>
+                                </div>
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <div class="schedule-label">เวลาเริ่ม</div>
+                                <input type="time" class="form-control" name="meeting_time_start[]" value="08:30" min="08:30" max="17:30">
+                            </div>
+                            <div class="col-6 col-md-2">
+                                <div class="schedule-label">ถึงเวลา</div>
+                                <input type="time" class="form-control" name="meeting_time_end[]" value="17:30" min="08:30" max="17:30">
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="schedule-label">ห้อง / Zoom</div>
+                                <select name="meetingroom[]" class="form-select meetingroom">
+                                    <option value="">-- เลือกเวลาก่อน --</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
                 `);
 
-                $('#table-schedule tbody').append(newRow);
+                $('#schedule-container').append(newCard);
 
-                newRow.find('.dateTrival').datepicker({
+                newCard.find('.dateTrival').datepicker({
                     dateFormat: 'dd/mm/yy',
                     appendTo: 'body',
                     minDate: 0
@@ -2153,7 +2191,7 @@ endif; ?>
             });
 
             $(document).on('click', '.removeRow', function() {
-                $(this).closest('tr').remove();
+                $(this).closest('.schedule-card').remove();
             });
 
             $('#showroom_3').on('change', function() {
@@ -2326,9 +2364,22 @@ endif; ?>
             });
         });
 
-        $(document).on('change', '.reserve, .dateTrival, input[name="meeting_time_start[]"], input[name="meeting_time_end[]"]', function() {
-            let row = $(this).closest('tr');
-            loadMeetingRoom(row);
+        $(document).on('change', '.reserve', function() {
+            const card = $(this).closest('.schedule-card');
+            const span = card.find('.reserve-icon');
+            if ($(this).val() === 'zoom') {
+                span.find('i').removeClass('ti-building').addClass('ti-video');
+                span.css('background', '#0ea5e9');
+            } else {
+                span.find('i').removeClass('ti-video').addClass('ti-building');
+                span.css('background', '#6366f1');
+            }
+            loadMeetingRoom(card);
+        });
+
+        $(document).on('change', '.dateTrival, input[name="meeting_time_start[]"], input[name="meeting_time_end[]"]', function() {
+            let card = $(this).closest('.schedule-card');
+            loadMeetingRoom(card);
         });
 
         async function get_objective_list() {
@@ -2441,10 +2492,11 @@ endif; ?>
             });
 
             let schedule = [];
-            $('#table-schedule tbody tr').each(function() {
-                if ($(this).find('.meetingroom').val() == null) return;
+            $('#schedule-container .schedule-card').each(function() {
+                if (!$(this).find('.meetingroom').val()) return;
                 schedule.push({
                     reserve: $(this).find('.reserve').val(),
+                    subject: $(this).find('input[name="meeting_subject[]"]').val(),
                     date: $(this).find('.dateTrival').val(),
                     time_start: $(this).find('input[name="meeting_time_start[]"]').val(),
                     time_end: $(this).find('input[name="meeting_time_end[]"]').val(),
@@ -2486,59 +2538,12 @@ endif; ?>
                             let response = typeof res === "string" ? JSON.parse(res) : res;
 
                             if (response.status) {
-                                if (!schedule || schedule.length === 0) {
-                                    Swal.fire({
-                                        icon: 'success',
-                                        title: 'สำเร็จ',
-                                        text: response.message
-                                    }).then(() => {
-                                        window.location.href = './listvisitor.php?page=listvisitor';
-                                    });
-                                    return;
-                                }
-
-                                const ajaxCalls = schedule.map(s => {
-                                    const parts = s.date.split('/');
-                                    const newDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
-                                    return $.ajax({
-                                        url: 'https://it.asefa.co.th/Zoompoo/functionPost.php',
-                                        type: 'POST',
-                                        data: {
-                                            'function': 'insertMeetingLog_Pdew',
-                                            'id': s.room,
-                                            'user_id': '',
-                                            'start_time': s.time_start,
-                                            'end_time': s.time_end,
-                                            'Subject': 'จองห้องประชุม',
-                                            'date_filter': newDate
-                                        }
-                                    }).then(
-                                        res => {
-                                            const r = typeof res === 'string' ? JSON.parse(res) : res;
-                                            return r.status === '1';
-                                        },
-                                        () => false
-                                    );
-                                });
-
-                                Promise.all(ajaxCalls).then(results => {
-                                    const allSuccess = results.every(r => r === true);
-
-                                    if (allSuccess) {
-                                        Swal.fire({
-                                            icon: 'success',
-                                            title: 'สำเร็จ',
-                                            text: response.message
-                                        }).then(() => {
-                                            window.location.href = './listvisitor.php?page=listvisitor';
-                                        });
-                                    } else {
-                                        Swal.fire({
-                                            icon: 'error',
-                                            title: 'ผิดพลาด',
-                                            text: 'ไม่สามารถจองห้องประชุมได้'
-                                        });
-                                    }
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'สำเร็จ',
+                                    text: response.message
+                                }).then(() => {
+                                    window.location.href = './listvisitor.php?page=listvisitor';
                                 });
                             } else {
                                 Swal.fire({
@@ -2548,14 +2553,23 @@ endif; ?>
                                 }).then(() => resetSaveState());
                             }
                         },
-                        error: err => {
+                        error: (jqXHR, textStatus, errorThrown) => {
                             resetSaveState(); // Re-enable save buttons
                             Swal.close();
-                            console.error(err);
+                            console.error('AJAX Error:', textStatus, errorThrown, jqXHR.responseText);
+                            let errMsg = 'ไม่สามารถเชื่อมต่อ API ได้';
+                            if (jqXHR.responseText) {
+                                try {
+                                    const errRes = JSON.parse(jqXHR.responseText);
+                                    if (errRes.message) errMsg = errRes.message;
+                                } catch(e) {
+                                    errMsg += ` (HTTP ${jqXHR.status}: ${errorThrown})`;
+                                }
+                            }
                             Swal.fire({
                                 icon: 'error',
                                 title: 'ผิดพลาด',
-                                text: 'ไม่สามารถเชื่อมต่อ API ได้'
+                                text: errMsg
                             });
                         }
                     });
@@ -2563,45 +2577,40 @@ endif; ?>
             });
         }
 
-        function loadMeetingRoom(row, selectedValue = null) {
-            let reserve = row.find('.reserve').val();
-            let dateTrival = row.find('.dateTrival').val();
-            let timeStart = row.find('input[name="meeting_time_start[]"]').val();
-            let timeEnd = row.find('input[name="meeting_time_end[]"]').val();
+        function loadMeetingRoom(card, selectedValue = null) {
+            let reserve = card.find('.reserve').val();
+            let dateTrival = card.find('.dateTrival').val();
+            let timeStart = card.find('input[name="meeting_time_start[]"]').val();
+            let timeEnd = card.find('input[name="meeting_time_end[]"]').val();
+            const select = card.find('.meetingroom');
 
             if (reserve && dateTrival && timeStart && timeEnd) {
-                let apiUrl = (reserve === 'meeting') ?
-                    'https://it.asefa.co.th/Zoompoo/check_room.php' :
-                    './api/check_zoom.php';
+                select.html('<option value="">กำลังโหลด...</option>').prop('disabled', true);
 
                 $.ajax({
-                    url: apiUrl,
+                    url: './api/check_available_room.php',
                     type: 'POST',
                     data: {
-                        type: reserve,
-                        booking_date: formatDateToYMD(dateTrival),
-                        time_start: timeStart,
-                        time_end: timeEnd
+                        reserve: reserve,
+                        dateTrival: formatDateToYMD(dateTrival),
+                        meeting_time_start: timeStart,
+                        meeting_time_end: timeEnd
                     },
                     dataType: 'json',
-                    success: async function(response) {
-                        // console.log(response);
-                        let select = row.find('.meetingroom');
-
-                        select.empty();
+                    success: function(response) {
+                        select.empty().prop('disabled', false);
                         select.append('<option value="">-- เลือกห้อง --</option>');
-
-                        if (response.data) {
-                            for (let item of Object.values(response.data)) {
-                                select.append(`<option value="${item.id_pk}">${item.room_name}</option>`);
-                            }
+                        if (response.status && response.data && response.data.length > 0) {
+                            response.data.forEach(item => {
+                                select.append(`<option value="${item.id}">${item.name}</option>`);
+                            });
+                        } else {
+                            select.append('<option value="" disabled>ไม่มีห้องว่างในช่วงเวลานี้</option>');
                         }
-
-                        if (selectedValue) {
-                            select.val(selectedValue);
-                        }
+                        if (selectedValue) select.val(selectedValue);
                     },
                     error: function(xhr, status, error) {
+                        select.html('<option value="">เกิดข้อผิดพลาด</option>').prop('disabled', false);
                         console.error("API error:", error);
                     }
                 });
@@ -2711,13 +2720,22 @@ endif; ?>
                                 });
                             }
                         },
-                        error: err => {
+                        error: (jqXHR, textStatus, errorThrown) => {
                             Swal.close();
-                            console.error(err);
+                            console.error('AJAX Error:', textStatus, errorThrown, jqXHR.responseText);
+                            let errMsg = 'ไม่สามารถเชื่อมต่อ API ได้';
+                            if (jqXHR.responseText) {
+                                try {
+                                    const errRes = JSON.parse(jqXHR.responseText);
+                                    if (errRes.message) errMsg = errRes.message;
+                                } catch(e) {
+                                    errMsg += ` (HTTP ${jqXHR.status}: ${errorThrown})`;
+                                }
+                            }
                             Swal.fire({
                                 icon: 'error',
                                 title: 'ผิดพลาด',
-                                text: 'ไม่สามารถเชื่อมต่อ API ได้'
+                                text: errMsg
                             });
                         }
                     });
@@ -2766,13 +2784,22 @@ endif; ?>
                                 });
                             }
                         },
-                        error: (error) => {
-                            console.log(error);
+                        error: (jqXHR, textStatus, errorThrown) => {
+                            console.error('AJAX Error:', textStatus, errorThrown, jqXHR.responseText);
                             Swal.close();
+                            let errMsg = 'ไม่สามารถเชื่อมต่อ API ได้';
+                            if (jqXHR.responseText) {
+                                try {
+                                    const errRes = JSON.parse(jqXHR.responseText);
+                                    if (errRes.message) errMsg = errRes.message;
+                                } catch(e) {
+                                    errMsg += ` (HTTP ${jqXHR.status}: ${errorThrown})`;
+                                }
+                            }
                             Swal.fire({
                                 icon: 'error',
                                 title: 'ผิดพลาด',
-                                text: 'ไม่สามารถเชื่อมต่อ API ได้'
+                                text: errMsg
                             });
                         }
                     });
@@ -2881,7 +2908,7 @@ endif; ?>
             }
         }
 
-        function renderAcknowledgeStatus(ackResult, currentStatus, visitorFormId) {
+        function renderAcknowledgeStatus(ackResult, currentStatus, visitorFormId, formData) {
             // ซ่อนถ้าไม่ใช่สถานะที่ต้องแสดง หรือไม่มีข้อมูล
             if (!ackResult || !ackResult.data || (currentStatus !== 3 && currentStatus !== 5 && currentStatus !== 6)) {
                 $('#acknowledge-status').hide();
@@ -2900,7 +2927,22 @@ endif; ?>
                 $('#nav-prd-tab').hide();
             }
 
+            // Determine which divisions to skip based on form data
+            let corp = {};
+            let travelArr = [];
+            if (formData) {
+                try { corp = JSON.parse(formData.CorporateDetail || '{}'); } catch(e) {}
+                try { travelArr = JSON.parse(formData.Travel || '[]'); } catch(e) {}
+            }
+            const showSueasarn = corp.serviceType === 'use_service';   // div 63
+            const showTransport = Array.isArray(travelArr) && travelArr.includes('Provide'); // div 65
+
             ackResult.data.forEach(item => {
+                // ตัด PRD ออก; ซ่อนสื่อสารถ้าไม่ขอใช้บริการ; ซ่อนขนส่งถ้าไม่จัดรถ
+                if (item.division_code == 83) return;
+                if (item.division_code == 63 && !showSueasarn) return;
+                if (item.division_code == 65 && !showTransport) return;
+
                 const info = DIVISION_INFO[item.division_code] || {
                     name: item.division_name,
                     icon: 'ti-building'
@@ -2955,6 +2997,20 @@ endif; ?>
             const info = DIVISION_INFO[divisionCode] || {
                 name: 'ฝ่าย'
             };
+
+            // วางแผน (61) — show PRD fields modal before acknowledging
+            if (divisionCode == 61) {
+                const existingStatus = $('input[name="prdTestStatus"]:checked').val() || '';
+                const existingRemark = $('#prdRemark').val() || '';
+                if (existingStatus === 'ready') $('#prdAckReady').prop('checked', true);
+                else if (existingStatus === 'not_ready') $('#prdAckNotReady').prop('checked', true);
+                else $('input[name="prdAckTestStatus"]').prop('checked', false);
+                $('#prdAckRemark').val(existingRemark);
+                $('#prdAckModal').data('visitor-form-id', visitorFormId);
+                new bootstrap.Modal(document.getElementById('prdAckModal')).show();
+                return;
+            }
+
             Swal.fire({
                 title: 'ยืนยันการรับทราบ?',
                 text: `คุณต้องการรับทราบในนามฝ่าย ${info.name} ใช่หรือไม่?`,
@@ -3005,6 +3061,52 @@ endif; ?>
                             });
                         }
                     });
+                }
+            });
+        }
+
+        function submitPrdAck() {
+            const visitorFormId = $('#prdAckModal').data('visitor-form-id');
+            const testStatus = $('input[name="prdAckTestStatus"]:checked').val() || '';
+            const remark = $('#prdAckRemark').val() || '';
+            const prdDetail = { testStatus: testStatus, remark: remark };
+
+            bootstrap.Modal.getInstance(document.getElementById('prdAckModal')).hide();
+            Swal.fire({ title: 'กำลังบันทึก...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            $.ajax({
+                url: 'api/visitor_acknowledge.php',
+                type: 'POST',
+                data: { action: 'update_prd', visitor_form_id: visitorFormId, prd_detail: JSON.stringify(prdDetail) },
+                success: res => {
+                    let r1 = typeof res === 'string' ? JSON.parse(res) : res;
+                    if (!r1.status) {
+                        Swal.close();
+                        Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: r1.message });
+                        return;
+                    }
+                    $.ajax({
+                        url: 'api/visitor_acknowledge.php',
+                        type: 'POST',
+                        data: { action: 'acknowledge', visitor_form_id: visitorFormId, division_code: 61 },
+                        success: res2 => {
+                            Swal.close();
+                            let r2 = typeof res2 === 'string' ? JSON.parse(res2) : res2;
+                            if (r2.status) {
+                                Swal.fire({ icon: 'success', title: 'รับทราบสำเร็จ', text: r2.message }).then(() => location.reload());
+                            } else {
+                                Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: r2.message });
+                            }
+                        },
+                        error: () => {
+                            Swal.close();
+                            Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ไม่สามารถเชื่อมต่อ API ได้' });
+                        }
+                    });
+                },
+                error: () => {
+                    Swal.close();
+                    Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ไม่สามารถเชื่อมต่อ API ได้' });
                 }
             });
         }
@@ -3204,10 +3306,11 @@ endif; ?>
             });
 
             let schedule = [];
-            $('#table-schedule tbody tr').each(function() {
-                if ($(this).find('.meetingroom').val() == null) return;
+            $('#schedule-container .schedule-card').each(function() {
+                if (!$(this).find('.meetingroom').val()) return;
                 schedule.push({
                     reserve: $(this).find('.reserve').val(),
+                    subject: $(this).find('input[name="meeting_subject[]"]').val(),
                     date: $(this).find('.dateTrival').val(),
                     time_start: $(this).find('input[name="meeting_time_start[]"]').val(),
                     time_end: $(this).find('input[name="meeting_time_end[]"]').val(),
@@ -3266,13 +3369,22 @@ endif; ?>
                                 });
                             }
                         },
-                        error: err => {
+                        error: (jqXHR, textStatus, errorThrown) => {
                             Swal.close();
-                            console.error(err);
+                            console.error('AJAX Error:', textStatus, errorThrown, jqXHR.responseText);
+                            let errMsg = 'ไม่สามารถเชื่อมต่อ API ได้';
+                            if (jqXHR.responseText) {
+                                try {
+                                    const errRes = JSON.parse(jqXHR.responseText);
+                                    if (errRes.message) errMsg = errRes.message;
+                                } catch(e) {
+                                    errMsg += ` (HTTP ${jqXHR.status}: ${errorThrown})`;
+                                }
+                            }
                             Swal.fire({
                                 icon: 'error',
                                 title: 'ผิดพลาด',
-                                text: 'ไม่สามารถเชื่อมต่อ API ได้'
+                                text: errMsg
                             });
                         }
                     });
@@ -3580,34 +3692,61 @@ endif; ?>
 
                 // --- 8. Schedule ---
                 if (d.Schedule && d.Schedule.length > 0) {
-                    $('#table-schedule tbody').empty();
+                    $('#schedule-container').empty();
                     d.Schedule.forEach(s => {
-                        let newRow = $(`
-                        <tr>
-                            <td>
-                                <select class="form-select reserve">
-                                    <option value="meeting" ${s.ReserveType === 'meeting' ? 'selected' : ''}>จองห้องประชุม</option>
-                                    <option value="zoom" ${s.ReserveType === 'zoom' ? 'selected' : ''}>จอง Zoom</option>
-                                </select>
-                            </td>
-                            <td width="250">
-                                <div class="input-group" style="width: 200px !important;">
-                                    <span class="input-group-text">📅</span>
-                                    <input class="form-control dateTrival" name="dateTrival[]" type="text" placeholder="dd/mm/yyyy" value="${s.VisitDate}" required>
+                        const isZoom = s.ReserveType === 'zoom';
+                        const iconClass = isZoom ? 'ti-video' : 'ti-building';
+                        const iconBg = isZoom ? '#0ea5e9' : '#6366f1';
+                        let newCard = $(`
+                        <div class="schedule-card">
+                            <div class="row g-2 align-items-end">
+                                <div class="col-12 col-md-4">
+                                    <div class="schedule-label">ประเภท</div>
+                                    <div class="input-group">
+                                        <span class="input-group-text reserve-icon px-2" style="background:${iconBg};color:white;transition:background .2s">
+                                            <i class="ti ${iconClass} fs-5"></i>
+                                        </span>
+                                        <select class="form-select reserve">
+                                            <option value="meeting" ${!isZoom ? 'selected' : ''}>ห้องประชุม</option>
+                                            <option value="zoom" ${isZoom ? 'selected' : ''}>Zoom</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </td>
-                            <td><input type="time" class="form-control" name="meeting_time_start[]" value="${s.TimeStart}"></td>
-                            <td><input type="time" class="form-control" name="meeting_time_end[]" value="${s.TimeEnd}"></td>
-                            <td><select name="meetingroom[]" class="form-select meetingroom"></select></td>
-                            <td class="text-center"><button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5 me-2"></i>ลบ</button></td>
-                        </tr>`);
-                        $('#table-schedule tbody').append(newRow);
-                        newRow.find('.dateTrival').datepicker({
+                                <div class="col-12 col-md-7">
+                                    <div class="schedule-label">หัวข้อการประชุม</div>
+                                    <input type="text" class="form-control" name="meeting_subject[]" value="${s.Subject || ''}" placeholder="หัวข้อการประชุม">
+                                </div>
+                                <div class="col-12 col-md-1 text-end">
+                                    <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="schedule-label">วันที่เยี่ยม</div>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="ti ti-calendar fs-5"></i></span>
+                                        <input class="form-control dateTrival" name="dateTrival[]" type="text" placeholder="dd/mm/yyyy" value="${s.VisitDate}" required>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-2">
+                                    <div class="schedule-label">เวลาเริ่ม</div>
+                                    <input type="time" class="form-control" name="meeting_time_start[]" value="${s.TimeStart}" min="08:30" max="17:30">
+                                </div>
+                                <div class="col-6 col-md-2">
+                                    <div class="schedule-label">ถึงเวลา</div>
+                                    <input type="time" class="form-control" name="meeting_time_end[]" value="${s.TimeEnd}" min="08:30" max="17:30">
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    <div class="schedule-label">ห้อง / Zoom</div>
+                                    <select name="meetingroom[]" class="form-select meetingroom"><option value="">-- เลือกห้อง --</option></select>
+                                </div>
+                            </div>
+                        </div>`);
+                        $('#schedule-container').append(newCard);
+                        newCard.find('.dateTrival').datepicker({
                             dateFormat: 'dd/mm/yy',
                             appendTo: 'body',
                             minDate: 0
                         });
-                        loadMeetingRoom(newRow, s.MeetingRoom);
+                        loadMeetingRoom(newCard, s.MeetingRoom);
                     });
                 }
 
@@ -3676,7 +3815,7 @@ endif; ?>
                 if (currentStatus === 3 || currentStatus === 5 || currentStatus === 6 || currentStatus === 9) {
                     setFormReadOnly(true);
                     const ackResult = await loadAcknowledgeStatus(d.Id);
-                    const allDone = renderAcknowledgeStatus(ackResult, currentStatus, d.Id);
+                    const allDone = renderAcknowledgeStatus(ackResult, currentStatus, d.Id, d);
 
                     // เก็บ ID สำหรับ PRD Edit
                     currentVisitorFormId = d.Id;
@@ -3695,7 +3834,7 @@ endif; ?>
 
                         // Close Job Button
                         if (allDone && isMKTHead) {
-                            buttons += `<button class="btn btn-dark shadow-sm text-white me-2" type="button" onclick="closeJob(${d.Id})"><i class="ti ti-check-all me-1"></i>ปิดงาน</button>`;
+                            buttons += `<button class="btn shadow-sm text-white me-2" style="background-color:#0d9488;border-color:#0d9488;" type="button" onclick="closeJob(${d.Id})"><i class="ti ti-check-all me-1"></i>ปิดงาน</button>`;
                         }
 
                         // ปุ่มเชิญลูกค้า (สำหรับ MKT Head)
@@ -3704,7 +3843,7 @@ endif; ?>
                         }
                     } else if (currentStatus === 6) {
                         buttons = `<span class="badge bg-dark fs-6 py-2 px-4 shadow-sm me-2"><i class="ti ti-check-all me-2"></i>ปิดงานแล้ว</span>`;
-                        buttons += `<button class="btn btn-primary shadow-sm text-white" type="button" onclick="openEvalQRModal(${d.Id})"><i class="fa-solid fa-qrcode me-1"></i>ลูกค้าประเมิน</button>`;
+                        buttons += `<button class="btn btn-primary shadow-sm" type="button" onclick="openEvalQRModal(${d.Id})"><i class="fa-solid fa-qrcode me-1"></i>ลูกค้าประเมิน</button>`;
                     } else if (currentStatus === 9) {
                         buttons = `<span class="badge bg-danger fs-6 py-2 px-4 shadow-sm me-2"><i class="ti ti-ban me-2"></i>ยกเลิกแล้ว</span>`;
                         buttons += `<button class="btn btn-outline-primary shadow-sm" type="button" onclick="copyVisitorForm(${d.Id})"><i class="ti ti-copy me-1"></i>คัดลอกข้อมูล</button>`;
@@ -4213,8 +4352,19 @@ endif; ?>
 
         let qrCodeInstance = null;
 
+        function encodeEvalId(id) {
+            const key = 'ASEFA_EVAL_2024';
+            const data = String(id) + '|' + Date.now();
+            let out = '';
+            for (let i = 0; i < data.length; i++) {
+                out += String.fromCharCode(data.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+            }
+            return btoa(out).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        }
+
         function openEvalQRModal(visitorId) {
-            currentEvalUrl = `https://it.asefa.co.th/visitorMKT/visi_question.php?id=${visitorId}`;
+            const token = encodeEvalId(visitorId);
+            currentEvalUrl = `https://it.asefa.co.th/visitorMKT/visi_question.php?eval_token=${token}`;
             $('#evalUrlInput').val(currentEvalUrl);
 
             // Clear previous QR
@@ -4265,6 +4415,41 @@ endif; ?>
             });
         }
     </script>
+
+    <!-- วางแผน Acknowledge Modal -->
+    <div class="modal fade" id="prdAckModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius:16px;overflow:hidden;">
+                <div class="modal-header border-0" style="background:#10B981;">
+                    <h5 class="modal-title text-white fw-bold"><i class="ti ti-clipboard-check me-2"></i>รับทราบ — ฝ่ายวางแผน</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body px-4 py-4">
+                    <div class="mb-4">
+                        <label class="fw-semibold mb-2 d-block"><i class="ti ti-clipboard-check fs-5 me-2 text-success"></i>สถานะการทดสอบ (Test)</label>
+                        <div class="d-flex flex-wrap gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="prdAckTestStatus" id="prdAckReady" value="ready">
+                                <label class="form-check-label" for="prdAckReady"><i class="ti ti-check text-success me-1"></i>พร้อม Test</label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="prdAckTestStatus" id="prdAckNotReady" value="not_ready">
+                                <label class="form-check-label" for="prdAckNotReady"><i class="ti ti-x text-danger me-1"></i>ไม่พร้อม Test</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="fw-semibold mb-2 d-block">หมายเหตุ</label>
+                        <textarea class="form-control" id="prdAckRemark" rows="3" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 px-4 pb-4 pt-0 gap-2">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-success text-white" onclick="submitPrdAck()"><i class="ti ti-check me-1"></i>รับทราบ</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </body>
 
