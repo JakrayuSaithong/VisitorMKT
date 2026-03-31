@@ -44,25 +44,7 @@ try {
         $timeStart = $corp['timeStart'] ?? '';
         $timeEnd = $corp['timeEnd'] ?? '';
         
-        // 1. Main Event (showroom) - เฉพาะเมื่อเลือก use_service เท่านั้น
-        if (($corp['serviceType'] ?? '') === 'use_service') {
-            $events[] = [
-                'id' => 'main_' . $row['Id'],
-                'title' => 'Showroom',
-                'start' => $eventDate . ($timeStart ? 'T' . $timeStart : ''),
-                'end' => $eventDate . ($timeEnd ? 'T' . $timeEnd : ''),
-                'extendedProps' => [
-                    'visitorFormId' => $row['Id'],
-                    'docNo' => $row['DocNo'],
-                    'eventType' => 'Showroom',
-                    'timeStart' => $timeStart,
-                    'timeEnd' => $timeEnd,
-                    'detail' => ''
-                ]
-            ];
-        }
-        
-        // 2. Welcome Service Event (ป้ายต้อนรับ)
+        // 1. Welcome Service Event (ป้ายต้อนรับ)
         if (!empty($corp['useWelcomeService'])) {
             $events[] = [
                 'id' => 'welcome_' . $row['Id'],
