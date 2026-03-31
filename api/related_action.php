@@ -19,8 +19,8 @@ if (!$action) {
 // ===== GET_DOCNO_LIST: ดึงรายการ DocNo ที่ user เคยสร้าง =====
 if ($action === 'get_docno_list') {
     try {
-        $sql = "SELECT Id, DocNo FROM VisitorForm WHERE UserCreated = ? AND Status IN (6) ORDER BY Id DESC";
-        $stmt = sqlsrv_query($konnext_DB64, $sql, [$userCode]);
+        $sql = "SELECT Id, DocNo FROM VisitorForm WHERE Status IN (6) ORDER BY Id DESC";
+        $stmt = sqlsrv_query($konnext_DB64, $sql);
         
         if (!$stmt) throw new Exception(print_r(sqlsrv_errors(), true));
         

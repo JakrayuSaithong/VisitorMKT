@@ -16,7 +16,6 @@ $isAdmin = $userPerm === 'Admin' || (is_array($userPerm) && in_array('Admin', $u
 $divisions = [
     'TC',
     'QC',
-    'PRD',
     'สื่อสาร',
     'จป.',
     'HR',
@@ -111,7 +110,7 @@ $divisions = [
                             <select id="docNo" name="doc_no" class="form-select" required>
                                 <option value="">-- เลือกเอกสาร --</option>
                             </select>
-                            <div class="form-text">แสดงเฉพาะเอกสารที่คุณเคยกรอกไว้</div>
+                            <div class="form-text">แสดงเฉพาะเอกสารที่ปิดจบแล้ว</div>
                         </div>
                         
                         <!-- Division Selection -->

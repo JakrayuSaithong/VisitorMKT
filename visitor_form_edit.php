@@ -926,7 +926,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                 <!-- Tab PRD (วางแผน) -->
                 <div class="tab-pane fade" id="nav-prd" role="tabpanel" aria-labelledby="nav-prd-tab" tabindex="0">
                     <div class="card border border-2 table-wrapper table-responsive">
-                        <h6 class="card-header py-3" style="background-color: #10B981; color: white;">ฝ่ายวางแผน (PRD)</h6>
+                        <h6 class="card-header py-3" style="background-color: #10B981; color: white;">ฝ่ายวางแผน</h6>
                         <div class="card-body">
                             <!-- Test Readiness -->
                             <div class="row mb-3">

@@ -22,7 +22,7 @@ try {
     // ถ้า Status = 3 (Approved) ให้สร้าง record ใน VisitorAcknowledg สำหรับทุกฝ่าย
     if ((int)$status === 3) {
         // รหัสฝ่ายที่ต้องรับทราบ: TC=54, QC=87, PRD=83, สื่อสาร=63, HR=31, วางแผน=61, ขนส่ง=65
-        $divisions = [54, 87, 83, 63, 31, 61, 65];
+        $divisions = [54, 87, 63, 31, 61, 65];
 
         // ตรวจสอบว่ามี record อยู่แล้วหรือไม่
         $checkSql = "SELECT COUNT(*) as cnt FROM VisitorAcknowledg WHERE VisitorFormId = ?";
@@ -135,6 +135,6 @@ try {
     }
 
     echo json_encode(["status" => true, "message" => "อัพเดทสถานะสำเร็จ"], JSON_UNESCAPED_UNICODE);
-} catch (Exception $e) {
+} catch (\Throwable $e) {
     echo json_encode(["status" => false, "message" => $e->getMessage()]);
 }

@@ -5,3 +5,7 @@
 CLAUDE.md
 .DS_Store
 /config
+
+.agents
+list_room.sql
+skills-lock.json
