@@ -88,6 +88,37 @@ include_once 'config/base.php';
 
     <?php include('js.php'); ?>
 
+    <!-- Customer Evaluation QR Modal -->
+    <div class="modal fade" id="evalQRModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; overflow: hidden;">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold"><i class="fa-solid fa-qrcode me-2"></i>QR Code ลูกค้าประเมิน</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div id="qrCodeDiv" class="d-flex justify-content-center mb-3"></div>
+                    <p class="text-muted small mb-3">สแกน QR Code เพื่อเปิดฟอร์มประเมิน</p>
+                    <div class="input-group mb-3">
+                        <input type="text" id="evalUrlInput" class="form-control form-control-sm" readonly>
+                        <button class="btn btn-outline-secondary" type="button" onclick="copyEvalLink()">
+                            <i class="fa-solid fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 justify-content-center gap-2">
+                    <button class="btn btn-success" type="button" onclick="downloadQR()">
+                        <i class="fa-solid fa-download me-1"></i>โหลด QR
+                    </button>
+                    <button class="btn btn-primary" type="button" onclick="copyEvalLink()">
+                        <i class="fa-solid fa-link me-1"></i>คัดลอกลิงก์
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script>
         $(document).ready(function() {
             const $tbody = $('table tbody');
@@ -118,6 +149,9 @@ include_once 'config/base.php';
                                     <a href="./quotation_list.php?page=listvisitor&id=${v.Id}" class="btn btn-sm btn-warning">
                                         <i class="ti ti-archive"></i> รายการประเมิน
                                     </a>
+                                    <button class="btn btn-sm btn-primary" onclick="openEvalQRModal(${v.Id})">
+                                        <i class="fa-solid fa-qrcode"></i> ลูกค้าประเมิน
+                                    </button>
                                 `;
                             }
 
@@ -161,6 +195,56 @@ include_once 'config/base.php';
                 }
             });
         });
+        let currentEvalUrl = '';
+        let qrCodeInstance = null;
+
+        function encodeEvalId(id) {
+            const key = 'ASEFA_EVAL_2024';
+            const data = String(id) + '|' + Date.now();
+            let out = '';
+            for (let i = 0; i < data.length; i++) {
+                out += String.fromCharCode(data.charCodeAt(i) ^ key.charCodeAt(i % key.length));
+            }
+            return btoa(out).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+        }
+
+        function openEvalQRModal(visitorId) {
+            const token = encodeEvalId(visitorId);
+            currentEvalUrl = `https://it.asefa.co.th/visitorMKT/visi_question.php?eval_token=${token}`;
+            $('#evalUrlInput').val(currentEvalUrl);
+            $('#qrCodeDiv').empty();
+            qrCodeInstance = new QRCode(document.getElementById('qrCodeDiv'), {
+                text: currentEvalUrl,
+                width: 200,
+                height: 200,
+                colorDark: '#000000',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+            $('#evalQRModal').modal('show');
+        }
+
+        function downloadQR() {
+            const img = document.querySelector('#qrCodeDiv img');
+            if (img) {
+                const link = document.createElement('a');
+                link.download = 'QRCode_CustomerEval.png';
+                link.href = img.src;
+                link.click();
+            }
+        }
+
+        function copyEvalLink() {
+            navigator.clipboard.writeText(currentEvalUrl).then(() => {
+                Swal.fire({ icon: 'success', title: 'คัดลอกลิงก์แล้ว!', timer: 1500, showConfirmButton: false });
+            }).catch(() => {
+                const input = document.getElementById('evalUrlInput');
+                input.select();
+                document.execCommand('copy');
+                Swal.fire({ icon: 'success', title: 'คัดลอกลิงก์แล้ว!', timer: 1500, showConfirmButton: false });
+            });
+        }
+
         function copyVisitorForm(id) {
             Swal.fire({
                 title: 'คัดลอกเอกสาร?',
