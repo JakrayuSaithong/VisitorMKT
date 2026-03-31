@@ -658,6 +658,19 @@ include_once 'config/base.php';
                                 <div class="col-12 col-md-1 text-end">
                                     <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
                                 </div>
+                                <div class="col-12 zoom-type-row" style="display:none;">
+                                    <div class="schedule-label">ประเภท Zoom</div>
+                                    <div class="d-flex gap-3 pt-1">
+                                        <div class="form-check">
+                                            <input class="form-check-input zoom-type-radio" type="radio" name="zt_0" value="Meeting" checked>
+                                            <label class="form-check-label">Meeting</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input zoom-type-radio" type="radio" name="zt_0" value="Seminar">
+                                            <label class="form-check-label">Seminar</label>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div class="col-12 col-md-4">
                                     <div class="schedule-label">วันที่เยี่ยม</div>
                                     <div class="input-group">
@@ -2021,7 +2034,10 @@ include_once 'config/base.php';
                 }
             });
 
+            let _ztCounter = 0;
+
             $('#addSchedule').on('click', function() {
+                const ztName = 'zt_' + (++_ztCounter);
                 let newCard = $(`
                     <div class="schedule-card">
                         <div class="row g-2 align-items-end">
@@ -2043,6 +2059,19 @@ include_once 'config/base.php';
                             </div>
                             <div class="col-12 col-md-1 text-end">
                                 <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
+                            </div>
+                            <div class="col-12 zoom-type-row" style="display:none;">
+                                <div class="schedule-label">ประเภท Zoom</div>
+                                <div class="d-flex gap-3 pt-1">
+                                    <div class="form-check">
+                                        <input class="form-check-input zoom-type-radio" type="radio" name="${ztName}" value="Meeting" checked>
+                                        <label class="form-check-label">Meeting</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input zoom-type-radio" type="radio" name="${ztName}" value="Seminar">
+                                        <label class="form-check-label">Seminar</label>
+                                    </div>
+                                </div>
                             </div>
                             <div class="col-12 col-md-4">
                                 <div class="schedule-label">วันที่เยี่ยม</div>
@@ -2079,7 +2108,19 @@ include_once 'config/base.php';
             });
 
             $(document).on('click', '.removeRow', function() {
-                $(this).closest('.schedule-card').remove();
+                const card = $(this).closest('.schedule-card');
+                Swal.fire({
+                    title: 'ยืนยันการลบ?',
+                    text: 'ต้องการลบการจองนี้ใช่หรือไม่?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'ลบ',
+                    cancelButtonText: 'ยกเลิก',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) card.remove();
+                });
             });
 
             $('#showroom_3').on('change', function() {
@@ -2351,18 +2392,40 @@ include_once 'config/base.php';
         $(document).on('change', '.reserve', function() {
             const card = $(this).closest('.schedule-card');
             const span = card.find('.reserve-icon');
-            if ($(this).val() === 'zoom') {
+            const isZoom = $(this).val() === 'zoom';
+            if (isZoom) {
                 span.find('i').removeClass('ti-building').addClass('ti-video');
                 span.css('background', '#0ea5e9');
             } else {
                 span.find('i').removeClass('ti-video').addClass('ti-building');
                 span.css('background', '#6366f1');
             }
+            card.find('.zoom-type-row').toggle(isZoom);
             loadMeetingRoom(card);
         });
 
-        $(document).on('change', '.dateTrival, input[name="meeting_time_start[]"], input[name="meeting_time_end[]"]', function() {
-            let card = $(this).closest('.schedule-card');
+        $(document).on('change', '.dateTrival', function() {
+            loadMeetingRoom($(this).closest('.schedule-card'));
+        });
+
+        $(document).on('change', 'input[name="meeting_time_start[]"]', function() {
+            const card = $(this).closest('.schedule-card');
+            const endInput = card.find('input[name="meeting_time_end[]"]');
+            if ($(this).val() && endInput.val() && endInput.val() <= $(this).val()) {
+                endInput.val('');
+            }
+            loadMeetingRoom(card);
+        });
+
+        $(document).on('change', 'input[name="meeting_time_end[]"]', function() {
+            const card = $(this).closest('.schedule-card');
+            const startVal = card.find('input[name="meeting_time_start[]"]').val();
+            const endVal = $(this).val();
+            if (startVal && endVal && endVal <= startVal) {
+                Swal.fire({ icon: 'warning', title: 'เวลาไม่ถูกต้อง', text: 'เวลาสิ้นสุดต้องมากกว่าเวลาเริ่มต้น', timer: 2000, showConfirmButton: false });
+                $(this).val('');
+                return;
+            }
             loadMeetingRoom(card);
         });
 
@@ -2482,6 +2545,7 @@ include_once 'config/base.php';
                 if (!$(this).find('.meetingroom').val()) return;
                 schedule.push({
                     reserve: $(this).find('.reserve').val(),
+                    zoom_type: $(this).find('.zoom-type-radio:checked').val() || 'Meeting',
                     subject: $(this).find('input[name="meeting_subject[]"]').val(),
                     date: $(this).find('.dateTrival').val(),
                     time_start: $(this).find('input[name="meeting_time_start[]"]').val(),
@@ -2524,13 +2588,47 @@ include_once 'config/base.php';
                             let response = typeof res === "string" ? JSON.parse(res) : res;
 
                             if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'สำเร็จ',
-                                    text: response.message
-                                }).then(() => {
-                                    window.location.href = './listvisitor.php?page=listvisitor';
-                                });
+                                if (response.bookingResults && response.bookingResults.length > 0) {
+                                    let html = '<div class="text-start">';
+                                    response.bookingResults.forEach((b, i) => {
+                                        const allOk = b.scheduleOk && b.meetingOk;
+                                        const badgeCls = allOk ? 'bg-success' : 'bg-danger';
+                                        const badgeTxt = allOk ? '✓ จองสำเร็จ' : '✗ จองไม่สำเร็จ';
+                                        const icon = b.reserve === 'zoom' ? 'video' : 'building';
+                                        html += `<div class="border rounded p-2 mb-2">`;
+                                        html += `<div class="d-flex justify-content-between align-items-center">`;
+                                        html += `<span class="fw-semibold"><i class="ti ti-${icon} me-1"></i>${b.roomname || b.subject || 'รายการ '+(i+1)}</span>`;
+                                        html += `<span class="badge ${badgeCls}">${badgeTxt}</span>`;
+                                        html += `</div>`;
+                                        if (b.reserve === 'zoom' && b.zoomUrl && allOk) {
+                                            html += `<div class="mt-2"><small class="text-muted d-block mb-1">Zoom Meeting Link:</small>`;
+                                            html += `<div class="input-group input-group-sm">`;
+                                            html += `<input type="text" class="form-control form-control-sm" value="${b.zoomUrl}" readonly id="zoomUrl_${i}" style="font-size:11px">`;
+                                            html += `<button class="btn btn-outline-primary btn-sm" type="button" onclick="var inp=document.getElementById('zoomUrl_${i}');inp.select();document.execCommand('copy');var bt=this;bt.innerHTML='✓ Copied';bt.className='btn btn-success btn-sm text-white';setTimeout(function(){bt.innerHTML='📋 Copy';bt.className='btn btn-outline-primary btn-sm'},2000)">📋 Copy</button>`;
+                                            html += `</div></div>`;
+                                        }
+                                        html += `</div>`;
+                                    });
+                                    html += '</div>';
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'บันทึกสำเร็จ',
+                                        html: html,
+                                        width: 520,
+                                        confirmButtonText: 'ตกลง',
+                                        allowOutsideClick: false
+                                    }).then(() => {
+                                        window.location.href = './listvisitor.php?page=listvisitor';
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'สำเร็จ',
+                                        text: response.message
+                                    }).then(() => {
+                                        window.location.href = './listvisitor.php?page=listvisitor';
+                                    });
+                                }
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -2575,12 +2673,26 @@ include_once 'config/base.php';
                     },
                     dataType: 'json',
                     success: function(response) {
+                        const selectedRooms = [];
+                        $('#schedule-container .schedule-card').each(function() {
+                            if ($(this).is(card)) return;
+                            const val = $(this).find('.meetingroom').val();
+                            if (val) selectedRooms.push(val);
+                        });
+
                         select.empty().prop('disabled', false);
                         select.append('<option value="">-- เลือกห้อง --</option>');
                         if (response.status && response.data && response.data.length > 0) {
+                            let hasOptions = false;
                             response.data.forEach(item => {
-                                select.append(`<option value="${item.id}">${item.name}</option>`);
+                                if (!selectedRooms.includes(item.id)) {
+                                    select.append(`<option value="${item.id}">${item.name}</option>`);
+                                    hasOptions = true;
+                                }
                             });
+                            if (!hasOptions) {
+                                select.append('<option value="" disabled>ไม่มีห้องว่างในช่วงเวลานี้</option>');
+                            }
                         } else {
                             select.append('<option value="" disabled>ไม่มีห้องว่างในช่วงเวลานี้</option>');
                         }
