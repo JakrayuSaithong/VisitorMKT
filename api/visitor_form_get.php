@@ -31,7 +31,7 @@ foreach ($row as $key => $value) {
     }
 }
 
-// Fetch Schedule
+// // Fetch Schedule
 $schedules = [];
 $sql2 = "SELECT * FROM VisitorSchedule WHERE VisitorFormId = ?";
 $stmt2 = sqlsrv_query($konnext_DB64, $sql2, [$id]);
@@ -42,6 +42,29 @@ if ($stmt2) {
                 $r['VisitDate'] = $r['VisitDate']->format('d/m/Y');
             } else {
                 $r['VisitDate'] = date('d/m/Y', strtotime($r['VisitDate']));
+            }
+        }
+        // สร้าง ZoomURL สำหรับ schedule ที่เป็น zoom
+        if (!empty($r['ReserveType']) && $r['ReserveType'] === 'zoom' && !empty($r['IDMeeting'])) {
+            $meetingIdVal = intval($r['IDMeeting']);
+            $sqlZL = "SELECT site_f_1183 FROM work_progress_091 WHERE site_id_91 = ?";
+            $stmtZL = mysqli_prepare($konnext_lqsym, $sqlZL);
+            if ($stmtZL) {
+                mysqli_stmt_bind_param($stmtZL, 'i', $meetingIdVal);
+                mysqli_stmt_execute($stmtZL);
+                $resultZL = mysqli_stmt_get_result($stmtZL);
+                if ($rowZL = mysqli_fetch_assoc($resultZL)) {
+                    $zoomLinkForUrl = $rowZL['site_f_1183'] ?? '';
+                    $dataForEncrypt = json_encode([
+                        "FromApp"   => 1,
+                        "Mode"      => "Meeting",
+                        "ModeID"    => $meetingIdVal,
+                        "URL"       => $zoomLinkForUrl,
+                        "XDateTime" => date('Y-m-d H:i:s')
+                    ]);
+                    $r['ZoomURL'] = 'https://erpapp.asefa.co.th/vx_GotoURL.php?DataE=' . urlencode(encryptIt($dataForEncrypt));
+                }
+                mysqli_stmt_close($stmtZL);
             }
         }
         $schedules[] = $r;

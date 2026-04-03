@@ -111,21 +111,72 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
 
 
 
+        /* === Schedule Booking Card — Modern SaaS === */
+        #schedule-container { display: flex; flex-direction: column; gap: 8px; }
         .schedule-card {
             background: #fff;
-            border: 1.5px solid #d1d5db;
+            border: 1px solid #e5e7eb;
+            border-left: 3px solid #6366f1;
             border-radius: 10px;
             padding: 12px 14px;
-            margin-bottom: 10px;
-            box-shadow: 0 1px 4px rgba(0,0,0,.06);
-            transition: box-shadow .2s;
+            transition: box-shadow .2s, border-left-color .25s;
         }
-        .schedule-card:hover { box-shadow: 0 3px 10px rgba(99,102,241,.12); }
+        .schedule-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.07); }
+        .schedule-card.is-zoom { border-left-color: #0ea5e9; }
         .schedule-card .schedule-label {
-            font-size: .72rem;
-            color: #6b7280;
-            margin-bottom: 2px;
+            font-size: .68rem; font-weight: 600; color: #9ca3af;
+            text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px;
         }
+        .scard-header {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f3f4f6;
+        }
+        .reserve-type-wrap {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #f9fafb; border: 1px solid #e5e7eb;
+            border-radius: 8px; padding: 4px 10px 4px 6px; flex-shrink: 0;
+        }
+        .reserve-type-wrap .reserve-icon {
+            width: 26px; height: 26px; border-radius: 6px;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; transition: background .2s; flex-shrink: 0;
+        }
+        .reserve-type-wrap .reserve {
+            border: none !important; background: transparent !important;
+            padding: 0 4px !important; font-size: .83rem !important;
+            font-weight: 500 !important; color: #374151 !important;
+            box-shadow: none !important; min-width: 90px;
+        }
+        .zoom-type-row {
+            overflow: hidden; max-width: 0; opacity: 0;
+            transition: max-width .25s ease, opacity .2s ease;
+            pointer-events: none; display: flex !important;
+            align-items: center; gap: 4px; flex-shrink: 0; white-space: nowrap;
+        }
+        .zoom-type-row.visible { max-width: 300px; opacity: 1; pointer-events: auto; }
+        .zoom-type-pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 12px; border-radius: 20px; border: 1.5px solid #e5e7eb;
+            cursor: pointer; font-size: .78rem; font-weight: 500; color: #6b7280;
+            transition: all .15s; user-select: none; margin: 0;
+        }
+        .zoom-type-pill.active { background: #e0f2fe; border-color: #0ea5e9; color: #0284c7; font-weight: 600; }
+        .zoom-type-pill input { display: none; }
+        .scard-delete-btn {
+            color: #d1d5db; background: transparent; border: none;
+            padding: 4px 6px; border-radius: 6px;
+            transition: color .15s, background .15s; line-height: 1;
+        }
+        .scard-delete-btn:hover { color: #ef4444; background: #fef2f2; }
+        .schedule-add-btn {
+            margin-top: 1rem;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%; padding: 9px; border: 1.5px dashed #d1d5db;
+            border-radius: 10px; background: transparent; color: #6b7280;
+            font-size: .85rem; font-weight: 500; cursor: pointer;
+            transition: border-color .2s, background .2s, color .2s;
+        }
+        .schedule-add-btn:hover { border-color: #6366f1; background: #f5f3ff; color: #6366f1; }
 
         #FoodTable th {
             background-color: #3AA9B0 !important;
@@ -500,7 +551,7 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                         <div class="card-body">
 
                             <div class="form-grid">
-                                            <!-- Row 0: Objective (Moved inside Job Card) -->
+                                            <!-- Row 0: Objective -->
                                             <div class="form-group-clean full-width checkbox-group">
                                                 <label><i class="ti ti-message-user"></i>วัตถุประสงค์การเยี่ยมชม</label>
                                                 <select class="form-select job-field job-select-objective" data-field="Objective" multiple></select>
@@ -657,49 +708,41 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                         </div>
                     </div>
 
-                    <div class="card border border-2 table-wrapper my-2 p-2">
-                        <div class="col-sm-12 d-flex justify-content-between">
-                            <label class="col-form-label"><i class="ti ti-calendar-event fs-5 me-2"></i>กรุณาระบุวันที่เยี่ยม</label>
-                            <button type="button" class="btn btn-success btn-sm text-white" id="addSchedule"><i class="ti ti-plus fs-5 me-2"></i>เพิ่มวันที่เยี่ยมชม</button>
-                        </div>
+                    <div class="d-flex align-items-center gap-2 mt-3 mb-3">
+                        <i class="ti ti-calendar-event fs-5" style="color:#6366f1"></i>
+                        <span class="fw-semibold text-body">กรุณาระบุวันที่เยี่ยม</span>
                     </div>
 
                     <div id="schedule-container">
                         <div class="schedule-card">
+                            <div class="scard-header">
+                                <div class="reserve-type-wrap">
+                                    <span class="reserve-icon" style="background:#6366f1">
+                                        <i class="ti ti-building fs-6"></i>
+                                    </span>
+                                    <select class="form-select reserve">
+                                        <option value="meeting">ห้องประชุม</option>
+                                        <option value="zoom">Zoom</option>
+                                    </select>
+                                </div>
+                                <div class="zoom-type-row">
+                                    <label class="zoom-type-pill active">
+                                        <input class="zoom-type-radio" type="radio" name="zt_0" value="Meeting" checked> Meeting
+                                    </label>
+                                    <label class="zoom-type-pill">
+                                        <input class="zoom-type-radio" type="radio" name="zt_0" value="Seminar"> Seminar
+                                    </label>
+                                </div>
+                                <button type="button" class="btn scard-delete-btn removeRow ms-auto">
+                                    <i class="ti ti-trash fs-5"></i>
+                                </button>
+                            </div>
                             <div class="row g-2 align-items-end">
                                 <div class="col-12 col-md-4">
-                                    <div class="schedule-label">ประเภท</div>
-                                    <div class="input-group">
-                                        <span class="input-group-text reserve-icon px-2" style="background:#6366f1;color:white;transition:background .2s">
-                                            <i class="ti ti-building fs-5"></i>
-                                        </span>
-                                        <select class="form-select reserve">
-                                            <option value="meeting">ห้องประชุม</option>
-                                            <option value="zoom">Zoom</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-7">
                                     <div class="schedule-label">หัวข้อการประชุม</div>
-                                    <input type="text" class="form-control" name="meeting_subject[]" placeholder="หัวข้อการประชุม">
+                                    <input type="text" class="form-control" name="meeting_subject[]" placeholder="ระบุหัวข้อการประชุม...">
                                 </div>
-                                <div class="col-12 col-md-1 text-end">
-                                    <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
-                                </div>
-                                <div class="col-12 zoom-type-row" style="display:none;">
-                                    <div class="schedule-label">ประเภท Zoom</div>
-                                    <div class="d-flex gap-3 pt-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input zoom-type-radio" type="radio" name="zt_0" value="Meeting" checked>
-                                            <label class="form-check-label">Meeting</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input zoom-type-radio" type="radio" name="zt_0" value="Seminar">
-                                            <label class="form-check-label">Seminar</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-3">
                                     <div class="schedule-label">วันที่เยี่ยม</div>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="ti ti-calendar fs-5"></i></span>
@@ -710,19 +753,31 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                                     <div class="schedule-label">เวลาเริ่ม</div>
                                     <input type="time" class="form-control" name="meeting_time_start[]" value="08:30" min="08:30" max="17:30">
                                 </div>
-                                <div class="col-6 col-md-2">
+                                <div class="col-6 col-md-1">
                                     <div class="schedule-label">ถึงเวลา</div>
                                     <input type="time" class="form-control" name="meeting_time_end[]" value="17:30" min="08:30" max="17:30">
                                 </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-2">
                                     <div class="schedule-label">ห้อง / Zoom</div>
                                     <select name="meetingroom[]" class="form-select meetingroom">
                                         <option value="">-- เลือกเวลาก่อน --</option>
                                     </select>
                                 </div>
                             </div>
+                            <div class="zoom-url-row d-none mt-2 pt-2" style="border-top:1px dashed #bae6fd">
+                                <div class="d-flex align-items-center gap-2">
+                                    <small class="text-nowrap" style="font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em">Zoom Link</small>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control zoom-url-input" readonly style="font-size:11.5px">
+                                        <button class="btn btn-outline-primary btn-sm zoom-url-copy" type="button"><i class="ti ti-copy"></i></button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <button type="button" class="schedule-add-btn" id="addSchedule">
+                        <i class="ti ti-plus fs-5"></i> เพิ่มวันที่เยี่ยมชม
+                    </button>
                 </div>
 
                 <!-- Tab Profile (ฝ่ายสื่อสาร) -->
@@ -1386,23 +1441,6 @@ endif; ?>
                 }
             });
 
-            // Initialize Objective select (multiple)
-            $(card).find('.job-select-objective').select2({
-                ...select2Common,
-                placeholder: 'เลือกวัตถุประสงค์'
-            }).html(cachedOptions.objective);
-
-            // Toggle Objective Other box
-            $(card).find('.job-select-objective').on('change', function() {
-                const vals = $(this).val() || [];
-                const boxOther = $(this).closest('.card-body').find('.box-objective-other');
-                if (vals.includes('Other')) { // Assuming 'Other' is the value for "อื่นๆ"
-                    boxOther.fadeIn();
-                } else {
-                    boxOther.hide().find('input').val('');
-                }
-            });
-
             // Initialize Requester select
             $(card).find('.job-select-requester').select2({
                 ...select2Common,
@@ -1421,6 +1459,23 @@ endif; ?>
                 ...select2Common,
                 placeholder: 'กรุณาเลือก TC ผู้รับผิดชอบ'
             }).val(null).trigger('change');
+
+            // Initialize Objective select (multiple)
+            $(card).find('.job-select-objective').select2({
+                ...select2Common,
+                placeholder: 'เลือกวัตถุประสงค์'
+            }).html(cachedOptions.objective);
+
+            // Toggle Objective Other box
+            $(card).find('.job-select-objective').on('change', function() {
+                const vals = $(this).val() || [];
+                const boxOther = $(this).closest('.card-body').find('.box-objective-other');
+                if (vals.includes('Other')) {
+                    boxOther.fadeIn();
+                } else {
+                    boxOther.hide().find('input').val('');
+                }
+            });
 
             // Initialize SN & WA selects
             $(card).find('.job-select-sn').select2({
@@ -2059,21 +2114,10 @@ endif; ?>
                 });
             });
 
-            // Cache Objective options for Select2 in Job Cards (moved from inline)
-            let objectiveHTML = '';
-            if (Array.isArray(objectiveList)) {
-                objectiveList.forEach(obj => objectiveHTML += `<option value="${obj.visit_objective_id}">${obj.visit_objective_name}</option>`);
-            }
-            objectiveHTML += '<option value="Other">อื่นๆ</option>';
-            cachedOptions.objective = objectiveHTML;
-
             // Populate and Init Sales Card Body Selects
             const salesCardBodyInit = document.querySelector('#nav-home .card-body');
             if (salesCardBodyInit) {
-                const objSelect = $(salesCardBodyInit).find('.job-select-objective');
-                objSelect.html(cachedOptions.objective);
-
-                // Initialize all selects (this binds events including Other toggle)
+                // Initialize all selects
                 initJobCardSelects(salesCardBodyInit);
             }
 
@@ -2092,11 +2136,20 @@ endif; ?>
             // Populate Lecturer select (ยังใช้ ID เดิม)
             $('#Lecturer').html(lecturerHTML);
 
+            // Cache Objective options for Select2 in Job Cards
+            let objectiveHTML = '';
+            if (Array.isArray(objectiveList)) {
+                objectiveList.forEach(obj => objectiveHTML += `<option value="${obj.visit_objective_id}">${obj.visit_objective_name}</option>`);
+            }
+            objectiveHTML += '<option value="Other">อื่นๆ</option>';
+            cachedOptions.objective = objectiveHTML;
+
             // Populate selects ใน Sales Card Body
             const salesCardBody = document.querySelector('#nav-home .card-body');
             if (salesCardBody) {
                 $(salesCardBody).find('.job-select-requester').html('<option value=""></option>' + requesterHTML);
                 $(salesCardBody).find('.job-select-tc').html('<option value=""></option>' + tcHTML);
+                $(salesCardBody).find('.job-select-objective').html(cachedOptions.objective);
 
                 // Init Select2 for Sales Card
                 initJobCardSelects(salesCardBody);
@@ -2138,54 +2191,38 @@ endif; ?>
                 }
             });
 
-            $('#objective_other').on('change', function() {
-                if (this.checked) {
-                    $('#box_objective_other').stop(true, true).slideDown(300);
-                } else {
-                    $('#box_objective_other').stop(true, true).slideUp(300);
-                }
-            });
-
-            let _ztCounter = 0;
-
             $('#addSchedule').on('click', function() {
                 const ztName = 'zt_' + (++_ztCounter);
                 let newCard = $(`
                     <div class="schedule-card">
+                        <div class="scard-header">
+                            <div class="reserve-type-wrap">
+                                <span class="reserve-icon" style="background:#6366f1">
+                                    <i class="ti ti-building fs-6"></i>
+                                </span>
+                                <select class="form-select reserve">
+                                    <option value="meeting">ห้องประชุม</option>
+                                    <option value="zoom">Zoom</option>
+                                </select>
+                            </div>
+                            <div class="zoom-type-row">
+                                <label class="zoom-type-pill active">
+                                    <input class="zoom-type-radio" type="radio" name="${ztName}" value="Meeting" checked> Meeting
+                                </label>
+                                <label class="zoom-type-pill">
+                                    <input class="zoom-type-radio" type="radio" name="${ztName}" value="Seminar"> Seminar
+                                </label>
+                            </div>
+                            <button type="button" class="btn scard-delete-btn removeRow ms-auto">
+                                <i class="ti ti-trash fs-5"></i>
+                            </button>
+                        </div>
                         <div class="row g-2 align-items-end">
                             <div class="col-12 col-md-4">
-                                <div class="schedule-label">ประเภท</div>
-                                <div class="input-group">
-                                    <span class="input-group-text reserve-icon px-2" style="background:#6366f1;color:white;transition:background .2s">
-                                        <i class="ti ti-building fs-5"></i>
-                                    </span>
-                                    <select class="form-select reserve">
-                                        <option value="meeting">ห้องประชุม</option>
-                                        <option value="zoom">Zoom</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-7">
                                 <div class="schedule-label">หัวข้อการประชุม</div>
-                                <input type="text" class="form-control" name="meeting_subject[]" placeholder="หัวข้อการประชุม">
+                                <input type="text" class="form-control" name="meeting_subject[]" placeholder="ระบุหัวข้อการประชุม...">
                             </div>
-                            <div class="col-12 col-md-1 text-end">
-                                <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
-                            </div>
-                            <div class="col-12 zoom-type-row" style="display:none;">
-                                <div class="schedule-label">ประเภท Zoom</div>
-                                <div class="d-flex gap-3 pt-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input zoom-type-radio" type="radio" name="${ztName}" value="Meeting" checked>
-                                        <label class="form-check-label">Meeting</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input zoom-type-radio" type="radio" name="${ztName}" value="Seminar">
-                                        <label class="form-check-label">Seminar</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-3">
                                 <div class="schedule-label">วันที่เยี่ยม</div>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="ti ti-calendar fs-5"></i></span>
@@ -2196,15 +2233,24 @@ endif; ?>
                                 <div class="schedule-label">เวลาเริ่ม</div>
                                 <input type="time" class="form-control" name="meeting_time_start[]" value="08:30" min="08:30" max="17:30">
                             </div>
-                            <div class="col-6 col-md-2">
+                            <div class="col-6 col-md-1">
                                 <div class="schedule-label">ถึงเวลา</div>
                                 <input type="time" class="form-control" name="meeting_time_end[]" value="17:30" min="08:30" max="17:30">
                             </div>
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-2">
                                 <div class="schedule-label">ห้อง / Zoom</div>
                                 <select name="meetingroom[]" class="form-select meetingroom">
                                     <option value="">-- เลือกเวลาก่อน --</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="zoom-url-row d-none mt-2 pt-2" style="border-top:1px dashed #bae6fd">
+                            <div class="d-flex align-items-center gap-2">
+                                <small class="text-nowrap" style="font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em">Zoom Link</small>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control zoom-url-input" readonly style="font-size:11.5px">
+                                    <button class="btn btn-outline-primary btn-sm zoom-url-copy" type="button"><i class="ti ti-copy"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2438,8 +2484,27 @@ endif; ?>
                 span.find('i').removeClass('ti-video').addClass('ti-building');
                 span.css('background', '#6366f1');
             }
-            card.find('.zoom-type-row').toggle(isZoom);
+            card.toggleClass('is-zoom', isZoom);
+            card.find('.zoom-type-row').toggleClass('visible', isZoom);
+            const hasUrl = !!card.find('.zoom-url-input').val();
+            card.find('.zoom-url-row').toggleClass('d-none', !isZoom || !hasUrl);
             loadMeetingRoom(card);
+        });
+
+        $(document).on('change', '.zoom-type-radio', function() {
+            $(this).closest('.zoom-type-row').find('.zoom-type-pill').removeClass('active');
+            $(this).closest('.zoom-type-pill').addClass('active');
+        });
+
+        $(document).on('click', '.zoom-url-copy', function() {
+            const input = $(this).closest('.input-group').find('.zoom-url-input')[0];
+            input.select();
+            document.execCommand('copy');
+            const btn = this;
+            $(btn).html('<i class="ti ti-check"></i>').removeClass('btn-outline-primary').addClass('btn-success');
+            setTimeout(() => {
+                $(btn).html('<i class="ti ti-copy"></i>').removeClass('btn-success').addClass('btn-outline-primary');
+            }, 2000);
         });
 
         $(document).on('change', '.dateTrival', function() {
@@ -2531,9 +2596,6 @@ endif; ?>
             $saveButtons.prop('disabled', true).addClass('disabled');
 
             let formData = new FormData();
-
-            // ข้อมูล Objective และอื่นๆ นอก Job Card
-            formData.append("ObjectiveOther", $('#Objective_other').val());
 
             // ข้อมูล Travel Tab
             formData.append("CustomerNameThai", $('#CustomerNameThai').val());
@@ -2703,6 +2765,7 @@ endif; ?>
             let timeStart = card.find('input[name="meeting_time_start[]"]').val();
             let timeEnd = card.find('input[name="meeting_time_end[]"]').val();
             const select = card.find('.meetingroom');
+            const excludeMeetingId = parseInt(card.data('meeting-id')) || 0;
 
             if (reserve && dateTrival && timeStart && timeEnd) {
                 select.html('<option value="">กำลังโหลด...</option>').prop('disabled', true);
@@ -2714,7 +2777,8 @@ endif; ?>
                         reserve: reserve,
                         dateTrival: formatDateToYMD(dateTrival),
                         meeting_time_start: timeStart,
-                        meeting_time_end: timeEnd
+                        meeting_time_end: timeEnd,
+                        exclude_meeting_id: excludeMeetingId
                     },
                     dataType: 'json',
                     success: function(response) {
@@ -2745,7 +2809,7 @@ endif; ?>
                     },
                     error: function(xhr, status, error) {
                         select.html('<option value="">เกิดข้อผิดพลาด</option>').prop('disabled', false);
-                        console.error("API error:", error);
+                        console.log("API error:", error);
                     }
                 });
             }
@@ -3173,11 +3237,19 @@ endif; ?>
                             Swal.close();
                             let response = typeof res === "string" ? JSON.parse(res) : res;
                             if (response.status) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: 'รับทราบสำเร็จ',
-                                    text: response.message
-                                }).then(() => location.reload());
+                                if (response.fat_warning) {
+                                    Swal.fire({
+                                        icon: 'warning',
+                                        title: 'รับทราบสำเร็จ (มีคำเตือน)',
+                                        html: response.message + '<br><small class="text-muted">' + response.fat_warning + '</small>'
+                                    }).then(() => location.reload());
+                                } else {
+                                    Swal.fire({
+                                        icon: 'success',
+                                        title: 'รับทราบสำเร็จ',
+                                        text: response.message
+                                    }).then(() => location.reload());
+                                }
                             } else {
                                 Swal.fire({
                                     icon: 'error',
@@ -3186,12 +3258,24 @@ endif; ?>
                                 });
                             }
                         },
-                        error: () => {
+                        error: (xhr, status, err) => {
                             Swal.close();
+                            let detail = '';
+                            if (xhr.responseText) {
+                                console.log(xhr.responseText);
+                                try {
+                                    let errJson = JSON.parse(xhr.responseText);
+                                    detail = errJson.message || xhr.responseText.substring(0, 300);
+                                } catch (e) {
+                                    detail = xhr.responseText.substring(0, 300);
+                                }
+                            } else {
+                                detail = status + (err ? ': ' + err : '');
+                            }
                             Swal.fire({
                                 icon: 'error',
                                 title: 'ผิดพลาด',
-                                text: 'ไม่สามารถเชื่อมต่อ API ได้'
+                                html: 'ไม่สามารถเชื่อมต่อ API ได้<br><small class="text-muted">' + detail + '</small>'
                             });
                         }
                     });
@@ -3394,9 +3478,6 @@ endif; ?>
             // เพิ่ม ID สำหรับอัพเดท
             formData.append("id", id);
 
-            // ข้อมูล Objective และอื่นๆ นอก Job Card
-            formData.append("ObjectiveOther", $('#Objective_other').val());
-
             // ข้อมูล Travel Tab
             formData.append("CustomerNameThai", $('#CustomerNameThai').val());
             formData.append("CustomerNameForeign", $('#CustomerNameForeign').val());
@@ -3568,6 +3649,8 @@ endif; ?>
         // EDIT MODE LOGIC
         // ==========================================
 
+        let _ztCounter = 0;
+
         async function getVisitorData(visitorId) {
             try {
                 Swal.fire({
@@ -3608,7 +3691,6 @@ endif; ?>
                 var currentStatus = d.Status;
 
                 // --- 1. Populate Simple Fields ---
-                $('#Objective_other').val(d.ObjectiveOther);
                 $('#ProjectName').val(d.ProjectName);
                 $('#JobNo').val(d.JobNo);
                 $('#ProductName').val(d.ProductName);
@@ -3627,17 +3709,6 @@ endif; ?>
                 $('#NumberDiners').val(d.NumberDiners);
                 $('#OtherMenu').val(d.OtherMenu);
                 $('#RemarkFood').val(d.RemarkFood);
-
-                // กรอกข้อมูลวัตถุประสงค์
-                try {
-                    const obj = JSON.parse(d.Objective || '[]');
-                    $('#List_objective').val(obj).trigger('change');
-                    if (obj.includes("other") || d.ObjectiveOther) {
-                        $("#box_objective_other").slideDown(300);
-                    }
-                } catch (e) {
-                    console.error("Error loading Objective:", e);
-                }
 
                 // แสดงแท็บวิทยากร (ถ้าจำเป็น)
                 try {
@@ -3800,7 +3871,8 @@ endif; ?>
                         $('#photoTimeStart').val(corp.photoTimeStart);
                         $('#photoTimeEnd').val(corp.photoTimeEnd);
                         (corp.photoLocations || []).forEach(loc => {
-                            if (['showroom', 'MP3', 'MP4'].includes(loc)) $(`#photoLoc${loc}`).prop('checked', true);
+                            if (loc === 'showroom') $('#photoLocShowroom').prop('checked', true);
+                            else if (['MP3', 'MP4'].includes(loc)) $(`#photoLoc${loc}`).prop('checked', true);
                             else {
                                 $('#photoLocOther').prop('checked', true).trigger('change');
                                 $('#photoLocOtherText').val(loc);
@@ -3869,41 +3941,35 @@ endif; ?>
                         const ztName = 'zt_' + (++_ztCounter);
                         const zoomTypeVal = s.ZoomType || 'Meeting';
                         let newCard = $(`
-                        <div class="schedule-card" data-schedule-id="${s.Id || ''}" data-meeting-id="${s.IDMeeting || ''}">
+                        <div class="schedule-card ${isZoom ? 'is-zoom' : ''}" data-schedule-id="${s.Id || ''}" data-meeting-id="${s.IDMeeting || ''}">
+                            <div class="scard-header">
+                                <div class="reserve-type-wrap">
+                                    <span class="reserve-icon" style="background:${iconBg}">
+                                        <i class="ti ${iconClass} fs-6"></i>
+                                    </span>
+                                    <select class="form-select reserve">
+                                        <option value="meeting" ${!isZoom ? 'selected' : ''}>ห้องประชุม</option>
+                                        <option value="zoom" ${isZoom ? 'selected' : ''}>Zoom</option>
+                                    </select>
+                                </div>
+                                <div class="zoom-type-row ${isZoom ? 'visible' : ''}">
+                                    <label class="zoom-type-pill ${zoomTypeVal === 'Meeting' ? 'active' : ''}">
+                                        <input class="zoom-type-radio" type="radio" name="${ztName}" value="Meeting" ${zoomTypeVal === 'Meeting' ? 'checked' : ''}> Meeting
+                                    </label>
+                                    <label class="zoom-type-pill ${zoomTypeVal === 'Seminar' ? 'active' : ''}">
+                                        <input class="zoom-type-radio" type="radio" name="${ztName}" value="Seminar" ${zoomTypeVal === 'Seminar' ? 'checked' : ''}> Seminar
+                                    </label>
+                                </div>
+                                <button type="button" class="btn scard-delete-btn removeRow ms-auto">
+                                    <i class="ti ti-trash fs-5"></i>
+                                </button>
+                            </div>
                             <div class="row g-2 align-items-end">
                                 <div class="col-12 col-md-4">
-                                    <div class="schedule-label">ประเภท</div>
-                                    <div class="input-group">
-                                        <span class="input-group-text reserve-icon px-2" style="background:${iconBg};color:white;transition:background .2s">
-                                            <i class="ti ${iconClass} fs-5"></i>
-                                        </span>
-                                        <select class="form-select reserve">
-                                            <option value="meeting" ${!isZoom ? 'selected' : ''}>ห้องประชุม</option>
-                                            <option value="zoom" ${isZoom ? 'selected' : ''}>Zoom</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-7">
                                     <div class="schedule-label">หัวข้อการประชุม</div>
-                                    <input type="text" class="form-control" name="meeting_subject[]" value="${s.Subject || ''}" placeholder="หัวข้อการประชุม">
+                                    <input type="text" class="form-control" name="meeting_subject[]" value="${s.Subject || ''}" placeholder="ระบุหัวข้อการประชุม...">
                                 </div>
-                                <div class="col-12 col-md-1 text-end">
-                                    <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
-                                </div>
-                                <div class="col-12 zoom-type-row" ${!isZoom ? 'style="display:none;"' : ''}>
-                                    <div class="schedule-label">ประเภท Zoom</div>
-                                    <div class="d-flex gap-3 pt-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input zoom-type-radio" type="radio" name="${ztName}" value="Meeting" ${zoomTypeVal === 'Meeting' ? 'checked' : ''}>
-                                            <label class="form-check-label">Meeting</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input zoom-type-radio" type="radio" name="${ztName}" value="Seminar" ${zoomTypeVal === 'Seminar' ? 'checked' : ''}>
-                                            <label class="form-check-label">Seminar</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-3">
                                     <div class="schedule-label">วันที่เยี่ยม</div>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="ti ti-calendar fs-5"></i></span>
@@ -3914,13 +3980,22 @@ endif; ?>
                                     <div class="schedule-label">เวลาเริ่ม</div>
                                     <input type="time" class="form-control" name="meeting_time_start[]" value="${s.TimeStart}" min="08:30" max="17:30">
                                 </div>
-                                <div class="col-6 col-md-2">
+                                <div class="col-6 col-md-1">
                                     <div class="schedule-label">ถึงเวลา</div>
                                     <input type="time" class="form-control" name="meeting_time_end[]" value="${s.TimeEnd}" min="08:30" max="17:30">
                                 </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-2">
                                     <div class="schedule-label">ห้อง / Zoom</div>
                                     <select name="meetingroom[]" class="form-select meetingroom"><option value="">-- เลือกห้อง --</option></select>
+                                </div>
+                            </div>
+                            <div class="zoom-url-row d-none mt-2 pt-2" style="border-top:1px dashed #bae6fd">
+                                <div class="d-flex align-items-center gap-2">
+                                    <small class="text-nowrap" style="font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em">Zoom Link</small>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control zoom-url-input" readonly style="font-size:11.5px">
+                                        <button class="btn btn-outline-primary btn-sm zoom-url-copy" type="button"><i class="ti ti-copy"></i></button>
+                                    </div>
                                 </div>
                             </div>
                         </div>`);
@@ -3931,6 +4006,10 @@ endif; ?>
                             minDate: 0
                         });
                         loadMeetingRoom(newCard, s.MeetingRoom);
+                        if (s.ZoomURL) {
+                            newCard.find('.zoom-url-input').val(s.ZoomURL);
+                            newCard.find('.zoom-url-row').removeClass('d-none');
+                        }
                     });
                 }
 
@@ -4109,25 +4188,21 @@ endif; ?>
             $card.find('[data-field="ObjectiveOther"]').val(job.ObjectiveOther || '');
             $card.find('[data-field="Detail"]').val(job.Detail || '');
 
-            // Populate Selects (Standard)
-            $card.find('.job-select-requester').val(job.RequesterCode).trigger('change');
-            $card.find('[data-field="RequesterDept"]').val(requesterDeptMap[job.RequesterCode] || job.RequesterDept || '');
-            $card.find('.job-select-tc').val(job.TCName).trigger('change');
-
             // Populate Objective (Multiple)
             if (job.Objective) {
                 const $obj = $card.find('.job-select-objective');
                 let objVal = job.Objective;
                 if (typeof objVal === 'string') {
-                    try {
-                        objVal = JSON.parse(objVal);
-                    } catch (e) {
-                        objVal = [objVal];
-                    }
+                    try { objVal = JSON.parse(objVal); } catch (e) { objVal = [objVal]; }
                 }
                 if (!Array.isArray(objVal)) objVal = [objVal];
                 $obj.val(objVal).trigger('change');
             }
+
+            // Populate Selects (Standard)
+            $card.find('.job-select-requester').val(job.RequesterCode).trigger('change');
+            $card.find('[data-field="RequesterDept"]').val(requesterDeptMap[job.RequesterCode] || job.RequesterDept || '');
+            $card.find('.job-select-tc').val(job.TCName).trigger('change');
 
             // Populate Contact Fields (Select2 Tags) - Support JSON Array for multiple
             const populateTagSelect = ($sel, val) => {

@@ -38,6 +38,167 @@ function isAdmin($perm) {
     return $perm === 'Admin' || (is_array($perm) && in_array('Admin', $perm));
 }
 
+// ===== FAT helpers =====
+function genFatCode() {
+    global $konnext_fat;
+    $sql = "SELECT SUBSTRING(MAX(fat_projectcode), 9, 4) AS lastdocno
+            FROM fat_projectmaster
+            WHERE CONVERT(DateCreate, DATE) BETWEEN '" . date('Y-m-01') . "' AND '" . date('Y-m-31') . "'
+            LIMIT 1";
+    $q = mysqli_query($konnext_fat, $sql);
+    $prefix = "FAT-" . substr((string)(date('Y') + 543), 2, 2) . date('m');
+    if ($q && mysqli_num_rows($q) > 0) {
+        $r = mysqli_fetch_assoc($q);
+        $next = (int)($r['lastdocno'] ?? 0) + 1;
+        return $prefix . sprintf('%04d', $next);
+    }
+    return $prefix . '0001';
+}
+
+function insertFatFromVisitorForm($visitorFormId) {
+    global $konnext_DB64, $konnext_DB64_ASF7, $konnext_fat;
+
+    // Fetch SalesDetail from VisitorForm
+    $sql = "SELECT SalesDetail FROM VisitorForm WHERE Id = ?";
+    $stmt = sqlsrv_query($konnext_DB64, $sql, [$visitorFormId]);
+    if (!$stmt) return [];
+    $row = sqlsrv_fetch_array($stmt, SQLSRV_FETCH_ASSOC);
+    sqlsrv_free_stmt($stmt);
+    if (!$row || empty($row['SalesDetail'])) return [];
+
+    $salesDetail = json_decode($row['SalesDetail'], true);
+    if (!is_array($salesDetail)) return [];
+
+    $createdCodes = [];
+
+    foreach ($salesDetail as $job) {
+        $jobItems = $job['JobItems'] ?? [];
+        // fallback: single job stored without JobItems array
+        if (empty($jobItems) && !empty($job['JobNo'])) {
+            $jobItems = [['JobNo' => $job['JobNo'], 'ProjectName' => $job['ProjectName'] ?? '']];
+        }
+        if (empty($jobItems)) continue;
+
+        $tcName       = $job['TCName'] ?? '';
+        $requesterCode = $job['RequesterCode'] ?? '';
+        $fat_usersend = implode(',', array_filter([$requesterCode, $tcName]));
+
+        // ProductName stored as JSON string e.g. '["AMD","IN"]'
+        $productNameRaw = $job['ProductName'] ?? '';
+        if (is_string($productNameRaw) && (strpos($productNameRaw, '[') === 0 || strpos($productNameRaw, '{') === 0)) {
+            $productArr = json_decode($productNameRaw, true);
+            $product_type = is_array($productArr) ? implode(',', $productArr) : $productNameRaw;
+        } elseif (is_array($productNameRaw)) {
+            $product_type = implode(',', $productNameRaw);
+        } else {
+            $product_type = $productNameRaw;
+        }
+
+        $detail = $job['Detail'] ?? '';
+
+        foreach ($jobItems as $item) {
+            $jobNo       = $item['JobNo'] ?? '';
+            $projectName = $item['ProjectName'] ?? '';
+            if (empty($jobNo)) continue;
+
+            // Query 1: DO document → owner, sale name, job value
+            $sql1 = "SELECT
+                         cust.Thai_Name                   AS CustomerName,
+                         SAL.[Name] + ' ' + SAL.Surname   AS SaleName,
+                         FORMAT(ts.Bill_Amount, 'F2')      AS BillAmount
+                     FROM  [cd-XPSQL-ASF7].dbo.Transection1   ts
+                     LEFT OUTER JOIN [cd-XPSQL-ASF7].dbo.Contact   cust ON cust.Contact_ID = ts.Customer_ID
+                     LEFT OUTER JOIN [cd-XPSQL-ASF7].dbo.Man_Info  SAL  ON SAL.ManID       = ts.MAN_ID
+                     WHERE ts.Doc_Type = 'DO'
+                       AND ts.Del      <> 'Y'
+                       AND ts.Doc_No   = ?
+                     GROUP BY cust.Thai_Name, SAL.[Name] + ' ' + SAL.Surname,
+                              ts.Other, ts.TotalPrice, ts.Bill_Amount, ts.Users";
+            $stmt1 = sqlsrv_query($konnext_DB64_ASF7, $sql1, [$jobNo]);
+            $q1 = ($stmt1) ? sqlsrv_fetch_array($stmt1, SQLSRV_FETCH_ASSOC) : null;
+            if ($stmt1) sqlsrv_free_stmt($stmt1);
+
+            $fat_owner = $q1['CustomerName'] ?? '';
+            $salename  = $q1['SaleName']     ?? '';
+            $jobvalue  = $q1['BillAmount']   ?? '';
+
+            // Query 2: WA documents → wa_no
+            $sql2 = "SELECT Doc_No
+                     FROM [cd-XPSQL-ASF7].dbo.Transection
+                     WHERE Doc_Type = 'WA'
+                       AND PO_No   = ?
+                     GROUP BY Doc_No, Lot_No";
+            $stmt2 = sqlsrv_query($konnext_DB64_ASF7, $sql2, [$jobNo]);
+            $wa_parts = [];
+            if ($stmt2) {
+                while ($r = sqlsrv_fetch_array($stmt2, SQLSRV_FETCH_ASSOC)) {
+                    $wa_parts[] = $r['Doc_No'];
+                }
+                sqlsrv_free_stmt($stmt2);
+            }
+            $wa_no = implode(',', $wa_parts);
+
+            // Query 3: Serial numbers → SN_no
+            $sql3 = "SELECT PartNo
+                     FROM [ASF_VIEW].dbo.vw_SerialServiceJob
+                     WHERE job_no = ?
+                     GROUP BY PartNo";
+            $stmt3 = sqlsrv_query($konnext_DB64_ASF7, $sql3, [$jobNo]);
+            $sn_parts = [];
+            if ($stmt3) {
+                while ($r = sqlsrv_fetch_array($stmt3, SQLSRV_FETCH_ASSOC)) {
+                    $sn_parts[] = $r['PartNo'];
+                }
+                sqlsrv_free_stmt($stmt3);
+            }
+            $sn_no = implode(',', $sn_parts);
+
+            // Generate FAT code and insert into MySQL fat_projectmaster
+            $fat_projectcode = genFatCode();
+
+            $e = function($v) use ($konnext_fat) { return mysqli_real_escape_string($konnext_fat, (string)$v); };
+
+            $insertSql = "INSERT INTO fat_projectmaster (
+                fat_projectcode, devitioncode, devitionname, fat_projectname,
+                fat_owner, owner_contact, fat_consult, fat_contractor, designer,
+                job_No, requireDate, salename, jobvalue, SN_no, wa_no,
+                product_type, fattest_date, status_code, fat_remark, fat_usersend,
+                DateCreate, CreateUser, CreateUserTH, LastUpdate, UserUpdate, Date_updatetxt
+            ) VALUES (
+                '" . $e($fat_projectcode) . "',
+                '" . $e($_SESSION['DivisionCode'] ?? '') . "',
+                '" . $e($_SESSION['DivisionHead2'] ?? '') . "',
+                '" . $e($projectName) . "',
+                '" . $e($fat_owner) . "',
+                '', '', '', '',
+                '" . $e($jobNo) . "',
+                '',
+                '" . $e($salename) . "',
+                '" . $e($jobvalue) . "',
+                '" . $e($sn_no) . "',
+                '" . $e($wa_no) . "',
+                '" . $e($product_type) . "',
+                now(), '1',
+                '" . $e($detail) . "',
+                '" . $e($fat_usersend) . "',
+                now(),
+                '" . $e($_SESSION['VisitorMKT_code'] ?? '') . "',
+                '" . $e($_SESSION['VisitorMKT_name'] ?? '') . "',
+                now(),
+                '" . $e($_SESSION['VisitorMKT_code'] ?? '') . "',
+                now()
+            )";
+
+            if (mysqli_query($konnext_fat, $insertSql)) {
+                $createdCodes[] = $fat_projectcode;
+            }
+            // $createdCodes[] = $insertSql;
+        }
+    }
+
+    return $createdCodes;
+}
+
 // ===== GET_STATUS: ดึงสถานะรับทราบทั้งหมด =====
 if ($action === 'get_status') {
     if (!$visitorFormId) {
@@ -141,6 +302,20 @@ if ($action === 'acknowledge') {
         $insertStmt = sqlsrv_query($konnext_DB64, $insertSql, [$visitorFormId, $divisionCode, $ackData]);
     }
 
+    // QC (87) รับทราบ → สร้าง FAT records จาก SalesDetail
+    $fatCodes = [];
+    $fatWarning = null;
+    if ((int)$divisionCode === 87 || isAdmin($userPerm)) {
+        ob_start();
+        $fatCodes = insertFatFromVisitorForm($visitorFormId);
+        // print_r($fatCodes);
+        // exit();
+        $captured = ob_get_clean(); // capture any PHP warnings/notices instead of letting them corrupt JSON
+        if (!empty(trim($captured))) {
+            $fatWarning = 'เกิดข้อผิดพลาดขณะสร้าง FAT: ' . trim(strip_tags($captured));
+        }
+    }
+
     // ตรวจสอบว่ารับทราบครบหรือยัง
     $countSql = "SELECT COUNT(*) as acked FROM VisitorAcknowledg WHERE VisitorFormId = ? AND IsAcknowledged = 1";
     $countStmt = sqlsrv_query($konnext_DB64, $countSql, [$visitorFormId]);
@@ -158,11 +333,18 @@ if ($action === 'acknowledge') {
         sqlsrv_query($konnext_DB64, $updateStatusSql, [$visitorFormId]);
     }
 
-    echo json_encode([
-        "status" => true,
-        "message" => $allAcknowledged ? "รับทราบครบทุกฝ่ายแล้ว" : "รับทราบเรียบร้อย",
-        "all_acknowledged" => $allAcknowledged
-    ], JSON_UNESCAPED_UNICODE);
+    $resp = [
+        "status"          => true,
+        "message"         => $allAcknowledged ? "รับทราบครบทุกฝ่ายแล้ว" : "รับทราบเรียบร้อย",
+        "all_acknowledged" => $allAcknowledged,
+    ];
+    if (!empty($fatCodes)) {
+        $resp["fat_codes"] = $fatCodes;
+    }
+    if ($fatWarning) {
+        $resp["fat_warning"] = $fatWarning;
+    }
+    echo json_encode($resp, JSON_UNESCAPED_UNICODE);
     exit;
 }
 

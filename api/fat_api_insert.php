@@ -76,7 +76,7 @@ $sql        =    "
                         '" . $_SESSION['DivisionHead2'] . "',
                         '" . $projectfatname . "',
                         '" . $owner . "',
-                        '" . $owner_contact . "',
+                        '',
                         '',
                         '',
                         '',

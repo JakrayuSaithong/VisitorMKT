@@ -31,12 +31,11 @@ try {
 
     $identityColumn = 'Id';
     $VisitorCode = $_SESSION['VisitorMKT_code'] ?? 'SYSTEM';
+    $VisitorID = $_SESSION['VisitorMKT_idref'] ?? 'SYSTEM';
     $DocNo = generateDocNo($konnext_DB64);
 
     $fields = [
         'DocNo',
-        'Objective',
-        'ObjectiveOther',
         'SalesDetail',
         'CorporateDetail',
         'LecturerDetail',
@@ -102,8 +101,8 @@ try {
                     ? DateTime::createFromFormat('d/m/Y', $s['date'])->format('Y-m-d')
                     : null;
                 $subject   = $s['subject'] ?? '';
-                $timeStart = $s['time_start'] ?? '';
-                $timeEnd   = $s['time_end'] ?? '';
+                $timeStart = substr($s['time_start'] ?? '', 0, 5); // normalize HH:MM:SS → HH:MM
+                $timeEnd   = substr($s['time_end']   ?? '', 0, 5);
                 $roomId    = $s['room'] ?? null;
                 $reserveType = $s['reserve'] ?? null;
 
@@ -111,23 +110,8 @@ try {
                 $scheduleOk = false;
                 $meetingOk = false;
                 $meetingId = null;
-                $sql2 = "INSERT INTO VisitorSchedule
-                         (VisitorFormId, ReserveType, VisitDate, TimeStart, TimeEnd, MeetingRoom, MeetingName, Subject, ZoomType)
-                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-                $params2 = [$visitorId, $reserveType, $visitDate, $timeStart, $timeEnd, $roomId, $s['roomname'] ?? null, $subject,
-                    ($reserveType === 'zoom' ? $zoomType : null)];
 
-                if (sqlsrv_query($konnext_DB64, $sql2, $params2)) {
-                    $scheduleOk = true;
-                } else {
-                    throw new Exception("ไม่สามารถบันทึกตารางเวลาได้: " . print_r(sqlsrv_errors(), true));
-                }
-
-                // Get inserted VisitorSchedule Id
-                $scheduleIdRow = sqlsrv_fetch_array(sqlsrv_query($konnext_DB64, "SELECT @@IDENTITY AS Id"), SQLSRV_FETCH_ASSOC);
-                $newScheduleId = $scheduleIdRow['Id'] ?? null;
-
-                // Insert into work_progress_091 (MySQL rypsoftcom_erp2)
+                // Insert into work_progress_091 FIRST (MySQL rypsoftcom_erp2)
                 if ($visitDate && $timeStart && $timeEnd && $roomId) {
                     $startDatetime = $visitDate . ' ' . $timeStart . ':00';
                     $endDatetime   = $visitDate . ' ' . $timeEnd   . ':00';
@@ -137,7 +121,7 @@ try {
                     $bookingStatus = ($reserveType === 'zoom') ? $zoomType : 'Meeting';
 
                     // สำหรับ Zoom: ดึง site_f_702 จาก work_progress_040 มาใส่ site_f_1183
-                    $zoomLinkValue = null;
+                    $zoomLinkValue = '';
                     if ($reserveType === 'zoom') {
                         $sqlGetZoomLink = "SELECT site_f_702 FROM work_progress_040 WHERE site_id_40 = ?";
                         $stmtZoom = mysqli_prepare($konnext_lqsym, $sqlGetZoomLink);
@@ -155,8 +139,17 @@ try {
                     $sqlErp = "INSERT INTO work_progress_091
                         (site_f_1133, site_f_3892, site_f_1171, site_f_1172, site_f_1134,
                          site_f_1173, site_f_1174, site_f_1175, site_f_1135, site_f_1136,
-                         site_f_1209, site_f_1210, site_f_3567, site_f_1183)
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?)";
+                         site_f_1209, site_f_1210, site_f_3567, site_f_1183, site_f_5108,
+                         site_f_5827, site_f_6702, site_f_7412, site_f_7413, site_f_5107,
+                         site_f_5106, site_f_3057, site_f_3572, site_f_5823, site_f_3604,
+                         site_f_3605, site_f_3616, site_f_3806, site_f_3807, site_f_3808,
+                         site_f_3907, site_f_3970, site_f_3980, site_f_3988, site_f_3989,
+                         site_f_4000, site_f_4001, site_f_4666, site_f_4676, site_f_4683,
+                         site_f_4702, site_f_4703, site_f_4771, site_f_1211, site_f_1227,
+                         site_f_1236, site_f_1281)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, ?, '0000-00-00 00:00:00',
+                                0, '', 0, 0, 0, 0, 600, '', 0, '', '', '', '', '', '',
+                                '', 0, 1, '', '', 0, 0, 0, 0, '', '', '', 0, '', 0, 0, 0)";
                     $stmtErp = mysqli_prepare($konnext_lqsym, $sqlErp);
                     if (!$stmtErp) {
                         throw new Exception("ไม่สามารถเตรียม SQL สำหรับ work_progress_091: " . mysqli_error($konnext_lqsym));
@@ -164,7 +157,7 @@ try {
                     mysqli_stmt_bind_param($stmtErp, 'sssssssssssis',
                         $subject, $bookingStatus, $visitDate, $timeStart, $startDatetime,
                         $visitDate, $timeEnd, $endDatetime,
-                        $roomId, $VisitorCode, $VisitorCode, $duration, $zoomLinkValue);
+                        $roomId, $VisitorID, $VisitorID, $duration, $zoomLinkValue);
                     if (mysqli_stmt_execute($stmtErp)) {
                         $meetingOk = true;
                         $meetingId = mysqli_insert_id($konnext_lqsym);
@@ -172,12 +165,24 @@ try {
                         throw new Exception("ไม่สามารถบันทึก work_progress_091: " . mysqli_stmt_error($stmtErp));
                     }
                     mysqli_stmt_close($stmtErp);
-
-                    // Store IDMeeting back to VisitorSchedule
-                    if ($newScheduleId && $meetingId) {
-                        sqlsrv_query($konnext_DB64, "UPDATE VisitorSchedule SET IDMeeting = ? WHERE Id = ?", [$meetingId, $newScheduleId]);
-                    }
                 }
+
+                // Then INSERT VisitorSchedule with IDMeeting already set
+                $sql2 = "INSERT INTO VisitorSchedule
+                         (VisitorFormId, ReserveType, VisitDate, TimeStart, TimeEnd, MeetingRoom, MeetingName, Subject, ZoomType, IDMeeting)
+                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                $params2 = [$visitorId, $reserveType, $visitDate, $timeStart, $timeEnd, $roomId, $s['roomname'] ?? null, $subject,
+                    ($reserveType === 'zoom' ? $zoomType : null), $meetingId];
+
+                if (sqlsrv_query($konnext_DB64, $sql2, $params2)) {
+                    $scheduleOk = true;
+                } else {
+                    throw new Exception("ไม่สามารถบันทึกตารางเวลาได้: " . print_r(sqlsrv_errors(), true));
+                }
+
+                // Get inserted VisitorSchedule Id
+                $scheduleIdRow = sqlsrv_fetch_array(sqlsrv_query($konnext_DB64, "SELECT @@IDENTITY AS Id"), SQLSRV_FETCH_ASSOC);
+                $newScheduleId = $scheduleIdRow['Id'] ?? null;
 
                 // สร้าง booking result สำหรับแสดง badge
                 $bookingResult = [
@@ -189,7 +194,15 @@ try {
                     'meetingId' => $meetingId
                 ];
                 if ($reserveType === 'zoom' && $meetingId) {
-                    $bookingResult['zoomUrl'] = 'https://erpapp.asefa.co.th/vx_ShortURL.php?ShortURLID=' . $meetingId . '&openExternalBrowser=1';
+                    $dataForEncrypt = json_encode([
+                        "FromApp"   => 1,
+                        "Mode"      => "Meeting",
+                        "ModeID"    => $meetingId,
+                        "URL"       => $zoomLinkValue,
+                        "XDateTime" => date('Y-m-d H:i:s')
+                    ]);
+                    $DataEMeeting = encryptIt($dataForEncrypt);
+                    $bookingResult['zoomUrl'] = 'https://erpapp.asefa.co.th/vx_GotoURL.php?DataE=' . urlencode($DataEMeeting);
                 }
                 $bookingResults[] = $bookingResult;
             }

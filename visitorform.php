@@ -107,21 +107,72 @@ include_once 'config/base.php';
 
 
 
+        /* === Schedule Booking Card — Modern SaaS === */
+        #schedule-container { display: flex; flex-direction: column; gap: 8px; }
         .schedule-card {
             background: #fff;
-            border: 1.5px solid #d1d5db;
+            border: 1px solid #e5e7eb;
+            border-left: 3px solid #6366f1;
             border-radius: 10px;
             padding: 12px 14px;
-            margin-bottom: 10px;
-            box-shadow: 0 1px 4px rgba(0,0,0,.06);
-            transition: box-shadow .2s;
+            transition: box-shadow .2s, border-left-color .25s;
         }
-        .schedule-card:hover { box-shadow: 0 3px 10px rgba(99,102,241,.12); }
+        .schedule-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.07); }
+        .schedule-card.is-zoom { border-left-color: #0ea5e9; }
         .schedule-card .schedule-label {
-            font-size: .72rem;
-            color: #6b7280;
-            margin-bottom: 2px;
+            font-size: .68rem; font-weight: 600; color: #9ca3af;
+            text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px;
         }
+        .scard-header {
+            display: flex; align-items: center; gap: 8px;
+            margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #f3f4f6;
+        }
+        .reserve-type-wrap {
+            display: inline-flex; align-items: center; gap: 6px;
+            background: #f9fafb; border: 1px solid #e5e7eb;
+            border-radius: 8px; padding: 4px 10px 4px 6px; flex-shrink: 0;
+        }
+        .reserve-type-wrap .reserve-icon {
+            width: 26px; height: 26px; border-radius: 6px;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: white; transition: background .2s; flex-shrink: 0;
+        }
+        .reserve-type-wrap .reserve {
+            border: none !important; background: transparent !important;
+            padding: 0 4px !important; font-size: .83rem !important;
+            font-weight: 500 !important; color: #374151 !important;
+            box-shadow: none !important; min-width: 90px;
+        }
+        .zoom-type-row {
+            overflow: hidden; max-width: 0; opacity: 0;
+            transition: max-width .25s ease, opacity .2s ease;
+            pointer-events: none; display: flex !important;
+            align-items: center; gap: 4px; flex-shrink: 0; white-space: nowrap;
+        }
+        .zoom-type-row.visible { max-width: 300px; opacity: 1; pointer-events: auto; }
+        .zoom-type-pill {
+            display: inline-flex; align-items: center; gap: 5px;
+            padding: 3px 12px; border-radius: 20px; border: 1.5px solid #e5e7eb;
+            cursor: pointer; font-size: .78rem; font-weight: 500; color: #6b7280;
+            transition: all .15s; user-select: none; margin: 0;
+        }
+        .zoom-type-pill.active { background: #e0f2fe; border-color: #0ea5e9; color: #0284c7; font-weight: 600; }
+        .zoom-type-pill input { display: none; }
+        .scard-delete-btn {
+            color: #d1d5db; background: transparent; border: none;
+            padding: 4px 6px; border-radius: 6px;
+            transition: color .15s, background .15s; line-height: 1;
+        }
+        .scard-delete-btn:hover { color: #ef4444; background: #fef2f2; }
+        .schedule-add-btn {
+            margin-top: 1rem;
+            display: flex; align-items: center; justify-content: center; gap: 6px;
+            width: 100%; padding: 9px; border: 1.5px dashed #d1d5db;
+            border-radius: 10px; background: transparent; color: #6b7280;
+            font-size: .85rem; font-weight: 500; cursor: pointer;
+            transition: border-color .2s, background .2s, color .2s;
+        }
+        .schedule-add-btn:hover { border-color: #6366f1; background: #f5f3ff; color: #6366f1; }
 
         #FoodTable th {
             background-color: #3AA9B0 !important;
@@ -471,7 +522,7 @@ include_once 'config/base.php';
                         <div class="card-body">
 
                             <div class="form-grid">
-                                            <!-- Row 0: Objective (Moved inside Job Card) -->
+                                            <!-- Row 0: Objective -->
                                             <div class="form-group-clean full-width checkbox-group">
                                                 <label><i class="ti ti-message-user"></i>วัตถุประสงค์การเยี่ยมชม</label>
                                                 <select class="form-select job-field job-select-objective" data-field="Objective" multiple></select>
@@ -629,49 +680,41 @@ include_once 'config/base.php';
                         </div>
                     </div>
 
-                    <div class="card border border-2 table-wrapper my-2 p-2">
-                        <div class="col-sm-12 d-flex justify-content-between">
-                            <label class="col-form-label"><i class="ti ti-calendar-event fs-5 me-2"></i>กรุณาระบุวันที่เยี่ยม</label>
-                            <button type="button" class="btn btn-success btn-sm text-white" id="addSchedule"><i class="ti ti-plus fs-5 me-2"></i>เพิ่มวันที่เยี่ยมชม</button>
-                        </div>
+                    <div class="d-flex align-items-center gap-2 mt-3 mb-3">
+                        <i class="ti ti-calendar-event fs-5" style="color:#6366f1"></i>
+                        <span class="fw-semibold text-body">กรุณาระบุวันที่เยี่ยม</span>
                     </div>
 
                     <div id="schedule-container">
                         <div class="schedule-card">
+                            <div class="scard-header">
+                                <div class="reserve-type-wrap">
+                                    <span class="reserve-icon" style="background:#6366f1">
+                                        <i class="ti ti-building fs-6"></i>
+                                    </span>
+                                    <select class="form-select reserve">
+                                        <option value="meeting">ห้องประชุม</option>
+                                        <option value="zoom">Zoom</option>
+                                    </select>
+                                </div>
+                                <div class="zoom-type-row">
+                                    <label class="zoom-type-pill active">
+                                        <input class="zoom-type-radio" type="radio" name="zt_0" value="Meeting" checked> Meeting
+                                    </label>
+                                    <label class="zoom-type-pill">
+                                        <input class="zoom-type-radio" type="radio" name="zt_0" value="Seminar"> Seminar
+                                    </label>
+                                </div>
+                                <button type="button" class="btn scard-delete-btn removeRow ms-auto">
+                                    <i class="ti ti-trash fs-5"></i>
+                                </button>
+                            </div>
                             <div class="row g-2 align-items-end">
                                 <div class="col-12 col-md-4">
-                                    <div class="schedule-label">ประเภท</div>
-                                    <div class="input-group">
-                                        <span class="input-group-text reserve-icon px-2" style="background:#6366f1;color:white;transition:background .2s">
-                                            <i class="ti ti-building fs-5"></i>
-                                        </span>
-                                        <select class="form-select reserve">
-                                            <option value="meeting">ห้องประชุม</option>
-                                            <option value="zoom">Zoom</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-7">
                                     <div class="schedule-label">หัวข้อการประชุม</div>
-                                    <input type="text" class="form-control" name="meeting_subject[]" placeholder="หัวข้อการประชุม">
+                                    <input type="text" class="form-control" name="meeting_subject[]" placeholder="ระบุหัวข้อการประชุม...">
                                 </div>
-                                <div class="col-12 col-md-1 text-end">
-                                    <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
-                                </div>
-                                <div class="col-12 zoom-type-row" style="display:none;">
-                                    <div class="schedule-label">ประเภท Zoom</div>
-                                    <div class="d-flex gap-3 pt-1">
-                                        <div class="form-check">
-                                            <input class="form-check-input zoom-type-radio" type="radio" name="zt_0" value="Meeting" checked>
-                                            <label class="form-check-label">Meeting</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input zoom-type-radio" type="radio" name="zt_0" value="Seminar">
-                                            <label class="form-check-label">Seminar</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-3">
                                     <div class="schedule-label">วันที่เยี่ยม</div>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="ti ti-calendar fs-5"></i></span>
@@ -682,19 +725,31 @@ include_once 'config/base.php';
                                     <div class="schedule-label">เวลาเริ่ม</div>
                                     <input type="time" class="form-control" name="meeting_time_start[]" value="08:30" min="08:30" max="17:30">
                                 </div>
-                                <div class="col-6 col-md-2">
+                                <div class="col-6 col-md-1">
                                     <div class="schedule-label">ถึงเวลา</div>
                                     <input type="time" class="form-control" name="meeting_time_end[]" value="17:30" min="08:30" max="17:30">
                                 </div>
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-md-2">
                                     <div class="schedule-label">ห้อง / Zoom</div>
                                     <select name="meetingroom[]" class="form-select meetingroom">
                                         <option value="">-- เลือกเวลาก่อน --</option>
                                     </select>
                                 </div>
                             </div>
+                            <div class="zoom-url-row d-none mt-2 pt-2" style="border-top:1px dashed #bae6fd">
+                                <div class="d-flex align-items-center gap-2">
+                                    <small class="text-nowrap" style="font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em">Zoom Link</small>
+                                    <div class="input-group input-group-sm">
+                                        <input type="text" class="form-control zoom-url-input" readonly style="font-size:11.5px">
+                                        <button class="btn btn-outline-primary btn-sm zoom-url-copy" type="button"><i class="ti ti-copy"></i></button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <button type="button" class="schedule-add-btn" id="addSchedule">
+                        <i class="ti ti-plus fs-5"></i> เพิ่มวันที่เยี่ยมชม
+                    </button>
                 </div>
 
                 <!-- Tab Profile (ฝ่ายสื่อสาร) -->
@@ -1328,22 +1383,6 @@ include_once 'config/base.php';
                 }
             });
 
-            // Initialize Objective select (multiple)
-            $(card).find('.job-select-objective').select2({
-                ...select2Common,
-                placeholder: 'เลือกวัตถุประสงค์'
-            }).html(cachedOptions.objective);
-
-            // Toggle Objective Other box
-            $(card).find('.job-select-objective').on('change', function() {
-                const vals = $(this).val() || [];
-                const boxOther = $(this).closest('.card-body').find('.box-objective-other');
-                if (vals.includes('Other')) { // Assuming 'Other' is the value for "อื่นๆ"
-                    boxOther.fadeIn();
-                } else {
-                    boxOther.hide().find('input').val('');
-                }
-            });
 
             // Initialize Requester select
             $(card).find('.job-select-requester').select2({
@@ -1363,6 +1402,23 @@ include_once 'config/base.php';
                 ...select2Common,
                 placeholder: 'กรุณาเลือก TC ผู้รับผิดชอบ'
             }).val(null).trigger('change');
+
+            // Initialize Objective select (multiple)
+            $(card).find('.job-select-objective').select2({
+                ...select2Common,
+                placeholder: 'เลือกวัตถุประสงค์'
+            }).html(cachedOptions.objective);
+
+            // Toggle Objective Other box
+            $(card).find('.job-select-objective').on('change', function() {
+                const vals = $(this).val() || [];
+                const boxOther = $(this).closest('.card-body').find('.box-objective-other');
+                if (vals.includes('Other')) {
+                    boxOther.fadeIn();
+                } else {
+                    boxOther.hide().find('input').val('');
+                }
+            });
 
             // Initialize SN & WA selects
             $(card).find('.job-select-sn').select2({
@@ -1947,21 +2003,10 @@ include_once 'config/base.php';
                 });
             });
 
-            // Cache Objective options for Select2 in Job Cards (moved from inline)
-            let objectiveHTML = '';
-            if (Array.isArray(objectiveList)) {
-                objectiveList.forEach(obj => objectiveHTML += `<option value="${obj.visit_objective_id}">${obj.visit_objective_name}</option>`);
-            }
-            objectiveHTML += '<option value="Other">อื่นๆ</option>';
-            cachedOptions.objective = objectiveHTML;
-
             // Populate and Init Sales Card Body Selects
             const salesCardBodyInit = document.querySelector('#nav-home .card-body');
             if (salesCardBodyInit) {
-                const objSelect = $(salesCardBodyInit).find('.job-select-objective');
-                objSelect.html(cachedOptions.objective);
-
-                // Initialize all selects (this binds events including Other toggle)
+                // Initialize all selects
                 initJobCardSelects(salesCardBodyInit);
             }
 
@@ -1980,11 +2025,20 @@ include_once 'config/base.php';
 
             $('#Lecturer').html(lecturerHTML);
 
+            // Cache Objective options for Select2 in Job Cards
+            let objectiveHTML = '';
+            if (Array.isArray(objectiveList)) {
+                objectiveList.forEach(obj => objectiveHTML += `<option value="${obj.visit_objective_id}">${obj.visit_objective_name}</option>`);
+            }
+            objectiveHTML += '<option value="Other">อื่นๆ</option>';
+            cachedOptions.objective = objectiveHTML;
+
             // Populate selects ใน Sales Card Body
             const salesCardBody = document.querySelector('#nav-home .card-body');
             if (salesCardBody) {
                 $(salesCardBody).find('.job-select-requester').html('<option value=""></option>' + requesterHTML);
                 $(salesCardBody).find('.job-select-tc').html('<option value=""></option>' + tcHTML);
+                $(salesCardBody).find('.job-select-objective').html(cachedOptions.objective);
 
                 // Init Select2 for Sales Card
                 initJobCardSelects(salesCardBody);
@@ -2026,13 +2080,6 @@ include_once 'config/base.php';
                 }
             });
 
-            $('#objective_other').on('change', function() {
-                if (this.checked) {
-                    $('#box_objective_other').stop(true, true).slideDown(300);
-                } else {
-                    $('#box_objective_other').stop(true, true).slideUp(300);
-                }
-            });
 
             let _ztCounter = 0;
 
@@ -2040,40 +2087,34 @@ include_once 'config/base.php';
                 const ztName = 'zt_' + (++_ztCounter);
                 let newCard = $(`
                     <div class="schedule-card">
+                        <div class="scard-header">
+                            <div class="reserve-type-wrap">
+                                <span class="reserve-icon" style="background:#6366f1">
+                                    <i class="ti ti-building fs-6"></i>
+                                </span>
+                                <select class="form-select reserve">
+                                    <option value="meeting">ห้องประชุม</option>
+                                    <option value="zoom">Zoom</option>
+                                </select>
+                            </div>
+                            <div class="zoom-type-row">
+                                <label class="zoom-type-pill active">
+                                    <input class="zoom-type-radio" type="radio" name="${ztName}" value="Meeting" checked> Meeting
+                                </label>
+                                <label class="zoom-type-pill">
+                                    <input class="zoom-type-radio" type="radio" name="${ztName}" value="Seminar"> Seminar
+                                </label>
+                            </div>
+                            <button type="button" class="btn scard-delete-btn removeRow ms-auto">
+                                <i class="ti ti-trash fs-5"></i>
+                            </button>
+                        </div>
                         <div class="row g-2 align-items-end">
                             <div class="col-12 col-md-4">
-                                <div class="schedule-label">ประเภท</div>
-                                <div class="input-group">
-                                    <span class="input-group-text reserve-icon px-2" style="background:#6366f1;color:white;transition:background .2s">
-                                        <i class="ti ti-building fs-5"></i>
-                                    </span>
-                                    <select class="form-select reserve">
-                                        <option value="meeting">ห้องประชุม</option>
-                                        <option value="zoom">Zoom</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-7">
                                 <div class="schedule-label">หัวข้อการประชุม</div>
-                                <input type="text" class="form-control" name="meeting_subject[]" placeholder="หัวข้อการประชุม">
+                                <input type="text" class="form-control" name="meeting_subject[]" placeholder="ระบุหัวข้อการประชุม...">
                             </div>
-                            <div class="col-12 col-md-1 text-end">
-                                <button type="button" class="btn btn-danger btn-sm removeRow"><i class="ti ti-trash fs-5"></i></button>
-                            </div>
-                            <div class="col-12 zoom-type-row" style="display:none;">
-                                <div class="schedule-label">ประเภท Zoom</div>
-                                <div class="d-flex gap-3 pt-1">
-                                    <div class="form-check">
-                                        <input class="form-check-input zoom-type-radio" type="radio" name="${ztName}" value="Meeting" checked>
-                                        <label class="form-check-label">Meeting</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input class="form-check-input zoom-type-radio" type="radio" name="${ztName}" value="Seminar">
-                                        <label class="form-check-label">Seminar</label>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-3">
                                 <div class="schedule-label">วันที่เยี่ยม</div>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="ti ti-calendar fs-5"></i></span>
@@ -2084,15 +2125,24 @@ include_once 'config/base.php';
                                 <div class="schedule-label">เวลาเริ่ม</div>
                                 <input type="time" class="form-control" name="meeting_time_start[]" value="08:30" min="08:30" max="17:30">
                             </div>
-                            <div class="col-6 col-md-2">
+                            <div class="col-6 col-md-1">
                                 <div class="schedule-label">ถึงเวลา</div>
                                 <input type="time" class="form-control" name="meeting_time_end[]" value="17:30" min="08:30" max="17:30">
                             </div>
-                            <div class="col-12 col-md-4">
+                            <div class="col-12 col-md-2">
                                 <div class="schedule-label">ห้อง / Zoom</div>
                                 <select name="meetingroom[]" class="form-select meetingroom">
                                     <option value="">-- เลือกเวลาก่อน --</option>
                                 </select>
+                            </div>
+                        </div>
+                        <div class="zoom-url-row d-none mt-2 pt-2" style="border-top:1px dashed #bae6fd">
+                            <div class="d-flex align-items-center gap-2">
+                                <small class="text-nowrap" style="font-size:.68rem;font-weight:600;color:#9ca3af;text-transform:uppercase;letter-spacing:.05em">Zoom Link</small>
+                                <div class="input-group input-group-sm">
+                                    <input type="text" class="form-control zoom-url-input" readonly style="font-size:11.5px">
+                                    <button class="btn btn-outline-primary btn-sm zoom-url-copy" type="button"><i class="ti ti-copy"></i></button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -2276,12 +2326,6 @@ include_once 'config/base.php';
                         if (firstJob.tc) {
                             $firstCard.find('.job-select-tc').val(firstJob.tc).trigger('change');
                         }
-                        if (firstJob.objectives) {
-                            $firstCard.find('.job-select-objective').val(firstJob.objectives).trigger('change');
-                        }
-                        if (firstJob.objectiveOther) {
-                            $firstCard.find('.box-objective-other textarea').val(firstJob.objectiveOther);
-                        }
                         // Restore Job items - store as pending (will be applied after CRM data loads)
                         const itemsToRestore = firstJob.JobItems && firstJob.JobItems.length > 0
                             ? firstJob.JobItems
@@ -2295,6 +2339,37 @@ include_once 'config/base.php';
                     let corp = JSON.parse(d.CorporateDetail || '{}');
                     if (corp.serviceType) {
                         $(`.corporate-service-type[value='${corp.serviceType}']`).prop('checked', true).trigger('change');
+                    }
+                    if (corp.serviceType === 'use_service') {
+                        if (corp.date) $('#corporateDate').val(corp.date);
+                        if (corp.usePhotoService) {
+                            $('#usePhotoService').prop('checked', true).trigger('change');
+                            $('#photoTimeStart').val(corp.photoTimeStart || '');
+                            $('#photoTimeEnd').val(corp.photoTimeEnd || '');
+                            (corp.photoLocations || []).forEach(loc => {
+                                if (loc === 'showroom') $('#photoLocShowroom').prop('checked', true);
+                                else if (['MP3', 'MP4'].includes(loc)) $(`#photoLoc${loc}`).prop('checked', true);
+                                else {
+                                    $('#photoLocOther').prop('checked', true).trigger('change');
+                                    $('#photoLocOtherText').val(loc);
+                                }
+                            });
+                        }
+                        if (corp.useWelcomeService) {
+                            $('#useWelcomeService').prop('checked', true).trigger('change');
+                            $('#welcomeTimeStart').val(corp.welcomeTimeStart || '');
+                            $('#welcomeTimeEnd').val(corp.welcomeTimeEnd || '');
+                            $('#welcomeDetail').val(corp.welcomeDetail || '');
+                            if (corp.screens) {
+                                for (const mpKey of ['MP1', 'MP2', 'MP3', 'MP4']) {
+                                    if (corp.screens[mpKey] && Array.isArray(corp.screens[mpKey])) {
+                                        for (const screenValue of corp.screens[mpKey]) {
+                                            $(`#welcomeServicePanel input[id^="welcome${mpKey}_"][value="${screenValue}"]`).prop('checked', true);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 } catch (e) {}
 
@@ -2400,8 +2475,27 @@ include_once 'config/base.php';
                 span.find('i').removeClass('ti-video').addClass('ti-building');
                 span.css('background', '#6366f1');
             }
-            card.find('.zoom-type-row').toggle(isZoom);
+            card.toggleClass('is-zoom', isZoom);
+            card.find('.zoom-type-row').toggleClass('visible', isZoom);
+            const hasUrl = !!card.find('.zoom-url-input').val();
+            card.find('.zoom-url-row').toggleClass('d-none', !isZoom || !hasUrl);
             loadMeetingRoom(card);
+        });
+
+        $(document).on('change', '.zoom-type-radio', function() {
+            $(this).closest('.zoom-type-row').find('.zoom-type-pill').removeClass('active');
+            $(this).closest('.zoom-type-pill').addClass('active');
+        });
+
+        $(document).on('click', '.zoom-url-copy', function() {
+            const input = $(this).closest('.input-group').find('.zoom-url-input')[0];
+            input.select();
+            document.execCommand('copy');
+            const btn = this;
+            $(btn).html('<i class="ti ti-copy"></i> Copied').removeClass('btn-outline-primary').addClass('btn-success');
+            setTimeout(() => {
+                $(btn).html('<i class="ti ti-copy"></i>').removeClass('btn-success').addClass('btn-outline-primary');
+            }, 2000);
         });
 
         $(document).on('change', '.dateTrival', function() {
@@ -2496,9 +2590,6 @@ include_once 'config/base.php';
 
             let formData = new FormData();
 
-            // ข้อมูล Objective และอื่นๆ นอก Job Card
-            formData.append("ObjectiveOther", $('#Objective_other').val());
-
             // ข้อมูล Travel Tab
             formData.append("CustomerNameThai", $('#CustomerNameThai').val());
             formData.append("CustomerNameForeign", $('#CustomerNameForeign').val());
@@ -2588,6 +2679,19 @@ include_once 'config/base.php';
                             let response = typeof res === "string" ? JSON.parse(res) : res;
 
                             if (response.status) {
+                                // Populate zoom URLs into schedule cards
+                                if (response.bookingResults && response.bookingResults.length > 0) {
+                                    const scheduleCards = [];
+                                    $('#schedule-container .schedule-card').each(function() {
+                                        if ($(this).find('.meetingroom').val()) scheduleCards.push($(this));
+                                    });
+                                    response.bookingResults.forEach((b, i) => {
+                                        if (b.reserve === 'zoom' && b.zoomUrl && scheduleCards[i]) {
+                                            scheduleCards[i].find('.zoom-url-input').val(b.zoomUrl);
+                                            scheduleCards[i].find('.zoom-url-row').removeClass('d-none');
+                                        }
+                                    });
+                                }
                                 if (response.bookingResults && response.bookingResults.length > 0) {
                                     let html = '<div class="text-start">';
                                     response.bookingResults.forEach((b, i) => {

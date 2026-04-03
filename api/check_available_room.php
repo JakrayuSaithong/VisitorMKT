@@ -2,10 +2,11 @@
 include_once '../config/base.php';
 header('Content-Type: application/json; charset=utf-8');
 
-$reserve    = trim($_POST['reserve'] ?? '');
-$date       = trim($_POST['dateTrival'] ?? '');
-$timeStart  = trim($_POST['meeting_time_start'] ?? '');
-$timeEnd    = trim($_POST['meeting_time_end'] ?? '');
+$reserve          = trim($_POST['reserve'] ?? '');
+$date             = trim($_POST['dateTrival'] ?? '');
+$timeStart        = trim($_POST['meeting_time_start'] ?? '');
+$timeEnd          = trim($_POST['meeting_time_end'] ?? '');
+$excludeMeetingId = intval($_POST['exclude_meeting_id'] ?? 0);
 
 if (!$reserve || !$date || !$timeStart || !$timeEnd) {
     echo json_encode(['status' => false, 'message' => 'ข้อมูลไม่ครบ', 'data' => []]);
@@ -33,6 +34,7 @@ $sql = "
         WHERE DATE(site_f_1134) = ?
         AND TIME(site_f_1134) < ?
         AND TIME(site_f_1175) > ?
+        AND site_id_91 != ?
     )
     ORDER BY w_40.site_f_701
 ";
@@ -43,9 +45,18 @@ if (!$stmt) {
     exit;
 }
 
-mysqli_stmt_bind_param($stmt, 'ssss', $roomType, $date, $timeEnd, $timeStart);
-mysqli_stmt_execute($stmt);
+mysqli_stmt_bind_param($stmt, 'ssssi', $roomType, $date, $timeEnd, $timeStart, $excludeMeetingId);
+
+if (!mysqli_stmt_execute($stmt)) {
+    echo json_encode(['status' => false, 'message' => 'Query execution failed: ' . mysqli_stmt_error($stmt), 'data' => []]);
+    exit;
+}
+
 $result = mysqli_stmt_get_result($stmt);
+if ($result === false) {
+    echo json_encode(['status' => false, 'message' => 'Failed to get result: ' . mysqli_stmt_error($stmt), 'data' => []]);
+    exit;
+}
 
 $rooms = [];
 while ($row = mysqli_fetch_assoc($result)) {
