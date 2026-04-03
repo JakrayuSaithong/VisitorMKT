@@ -157,14 +157,14 @@ try {
   // ========================================
   if ($action === 'send_invitation') {
     // Load PHPMailer
-    $phpMailerPath = __DIR__ . '/../vendor/phpmailer/PHPMailer.php';
+    $phpMailerPath = __DIR__ . '/../vendor/phpmailer/src/PHPMailer.php';
     if (!file_exists($phpMailerPath)) {
       throw new Exception('PHPMailer not found. Please install PHPMailer.');
     }
 
-    require_once __DIR__ . '/../vendor/phpmailer/Exception.php';
-    require_once __DIR__ . '/../vendor/phpmailer/PHPMailer.php';
-    require_once __DIR__ . '/../vendor/phpmailer/SMTP.php';
+    require_once __DIR__ . '/../vendor/phpmailer/src/Exception.php';
+    require_once __DIR__ . '/../vendor/phpmailer/src/PHPMailer.php';
+    require_once __DIR__ . '/../vendor/phpmailer/src/SMTP.php';
 
     // Get visitor form data for email content
     $formSql = "SELECT vf.UserCreated, vs.VisitDate, vs.TimeStart, vs.TimeEnd
