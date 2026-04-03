@@ -5,6 +5,10 @@
  * ใช้ SQL Server (sqlsrv) + PHPMailer
  */
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception as MailerException;
+
 ob_start();
 
 ini_set('display_errors', 1);
@@ -45,6 +49,38 @@ function encodeVisitorId($id)
   $urlSafe = rtrim($urlSafe, '=');
 
   return $urlSafe;
+}
+
+function setupSMTPConnection($mail) {
+    $connectionMethods = [
+        [
+            'secure' => PHPMailer::ENCRYPTION_STARTTLS,
+            'port' => 587
+        ],
+        [
+            'secure' => PHPMailer::ENCRYPTION_SMTPS,
+            'port' => 465
+        ],
+        [
+            'secure' => false,
+            'port' => 25
+        ]
+    ];
+
+    $lastException = null;
+    foreach ($connectionMethods as $method) {
+        try {
+            $mail->SMTPSecure = $method['secure'];
+            $mail->Port = $method['port'];
+            $mail->smtpConnect();
+            return true;
+        } catch (Exception $e) {
+            $lastException = $e;
+            continue;
+        }
+    }
+    
+    throw new Exception("SMTP connection failed with all methods. Last error: " . $lastException->getMessage());
 }
 
 // ใช้ connection สำหรับ VisitorCompany database
@@ -121,14 +157,14 @@ try {
   // ========================================
   if ($action === 'send_invitation') {
     // Load PHPMailer
-    $phpMailerPath = __DIR__ . '/../vendor/phpmailer/src/PHPMailer.php';
+    $phpMailerPath = __DIR__ . '/../vendor/phpmailer/PHPMailer.php';
     if (!file_exists($phpMailerPath)) {
       throw new Exception('PHPMailer not found. Please install PHPMailer.');
     }
 
-    require_once __DIR__ . '/../vendor/phpmailer/src/Exception.php';
-    require_once __DIR__ . '/../vendor/phpmailer/src/PHPMailer.php';
-    require_once __DIR__ . '/../vendor/phpmailer/src/SMTP.php';
+    require_once __DIR__ . '/../vendor/phpmailer/Exception.php';
+    require_once __DIR__ . '/../vendor/phpmailer/PHPMailer.php';
+    require_once __DIR__ . '/../vendor/phpmailer/SMTP.php';
 
     // Get visitor form data for email content
     $formSql = "SELECT vf.UserCreated, vs.VisitDate, vs.TimeStart, vs.TimeEnd
@@ -197,7 +233,7 @@ try {
       $verifyLink = "https://it.asefa.co.th/visitorMKT/visi_asefa.php?visi_token=" . $encodedId;
 
       try {
-        $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+        $mail = new PHPMailer(true);
 
         // SMTP Configuration (แก้ไขตามที่ใช้จริง)
         $mail->isSMTP();
@@ -206,17 +242,18 @@ try {
         $mail->SMTPAutoTLS = false;
         $mail->Username = 'csd@asefa.co.th'; // เปลี่ยนเป็น email จริง
         $mail->Password = 'vk:uak2025vk:uak2025'; // เปลี่ยนเป็น app password
-        $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
-        $mail->Port = 465;
+        $mail->SMTPSecure = 'ssl';
         $mail->CharSet = 'UTF-8';
+        
+        setupSMTPConnection($mail);
 
-        $mail->SMTPOptions = array(
-          'ssl' => array(
-            'verify_peer' => false,
-            'verify_peer_name' => false,
-            'allow_self_signed' => true
-          )
-        );
+        // $mail->SMTPOptions = array(
+        //   'ssl' => array(
+        //     'verify_peer' => false,
+        //     'verify_peer_name' => false,
+        //     'allow_self_signed' => true
+        //   )
+        // );
 
         // Sender
         $mail->setFrom('csd@asefa.co.th', 'ASEFA Visitor Management');

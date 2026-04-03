@@ -3135,6 +3135,15 @@ endif; ?>
             const showSueasarn = corp.serviceType === 'use_service';   // div 63
             const showTransport = Array.isArray(travelArr) && travelArr.includes('Provide'); // div 65
 
+            // คำนวณ allDone จากฝ่ายที่แสดงจริง (ไม่รวม PRD, สื่อสาร/ขนส่งที่ไม่เกี่ยวข้อง)
+            const visibleItems = ackResult.data.filter(item => {
+                if (item.division_code == 83) return false;
+                if (item.division_code == 63 && !showSueasarn) return false;
+                if (item.division_code == 65 && !showTransport) return false;
+                return true;
+            });
+            const allDoneLocal = visibleItems.length > 0 && visibleItems.every(item => item.is_acknowledged);
+
             ackResult.data.forEach(item => {
                 // ตัด PRD ออก; ซ่อนสื่อสารถ้าไม่ขอใช้บริการ; ซ่อนขนส่งถ้าไม่จัดรถ
                 if (item.division_code == 83) return;
@@ -3188,7 +3197,7 @@ endif; ?>
             $('#ack-divisions').html(html);
             $('#acknowledge-status').slideDown(300);
 
-            return ackResult.all_acknowledged;
+            return allDoneLocal;
         }
 
         function acknowledgeAction(visitorFormId, divisionCode) {
