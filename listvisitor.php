@@ -60,6 +60,19 @@ include_once 'config/base.php';
             </div>
         </div>
         <div class="card table-wrapper table-responsive p-2">
+            <div class="d-flex justify-content-end mb-3 mt-2 px-2">
+                <div style="width: 250px;">
+                    <select id="statusFilter" class="form-select border-1 shadow-sm">
+                        <option value="">-- All Status --</option>
+                        <option value="1">New (สถานะใหม่)</option>
+                        <option value="2">Accepted (รับทราบ)</option>
+                        <option value="3">Approved (อนุมัติ)</option>
+                        <option value="5">Submit (ขออนุมัติ)</option>
+                        <option value="6">Closed (ปิดงาน)</option>
+                        <option value="9">Cancel (ยกเลิก)</option>
+                    </select>
+                </div>
+            </div>
             <table class="table">
                 <thead>
                     <tr>
@@ -181,9 +194,29 @@ include_once 'config/base.php';
                             $('.table').DataTable().destroy();
                         }
 
-                        $(".table").DataTable({
+                        let table = $(".table").DataTable({
                             responsive: true,
                             scrollX: true
+                        });
+
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const initialStatus = urlParams.get('status');
+
+                        if (initialStatus) {
+                            $('#statusFilter').val(initialStatus);
+                            if(status_text[initialStatus]) {
+                                table.column(4).search('^' + status_text[initialStatus] + '$', true, false).draw();
+                            }
+                        }
+
+                        $('#statusFilter').off('change').on('change', function() {
+                            const val = $(this).val();
+                            if(val === "") {
+                                table.column(4).search('').draw();
+                            } else {
+                                const text = status_text[val];
+                                table.column(4).search('^' + text + '$', true, false).draw();
+                            }
                         });
                     } else {
                         $tbody.html('<tr><td colspan="8" class="text-center text-muted">ไม่พบข้อมูล</td></tr>');

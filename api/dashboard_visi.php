@@ -13,22 +13,24 @@ $sql = "
     DECLARE @month INT = MONTH(@date);
     DECLARE @year INT = YEAR(@date);
 
-    SELECT 
+    SELECT
         JSON_QUERY((
-            SELECT 
+            SELECT
                 SUM(CASE WHEN Status = 1 THEN 1 ELSE 0 END) AS [New],
-                SUM(CASE WHEN Status = 2 THEN 1 ELSE 0 END) AS [Accept],
-                SUM(CASE WHEN Status = 3 THEN 1 ELSE 0 END) AS [Closed]
+                SUM(CASE WHEN Status = 2 THEN 1 ELSE 0 END) AS [Acept],
+                SUM(CASE WHEN Status = 3 THEN 1 ELSE 0 END) AS [Approved],
+                SUM(CASE WHEN Status = 5 THEN 1 ELSE 0 END) AS [Submit],
+                SUM(CASE WHEN Status = 6 THEN 1 ELSE 0 END) AS [Closed]
             FROM VisitorForm
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
         )) AS StatusSummary,
 
         JSON_QUERY((
-            SELECT 
+            SELECT
                 COUNT(*) AS TotalVisitor,
-                SUM(CASE WHEN CustomerNameThai IS NOT NULL THEN 1 ELSE 0 END) AS ThaiCustomers,
-                SUM(CASE WHEN CustomerNameForeign IS NOT NULL THEN 1 ELSE 0 END) AS ForeignCustomers,
-                COUNT(*) AS TotalCustomers
+                SUM(CASE WHEN ISNULL(CustomerNameThai, 0) > 0 THEN CustomerNameThai ELSE 0 END) AS ThaiCustomers,
+                SUM(CASE WHEN ISNULL(CustomerNameForeign, 0) > 0 THEN CustomerNameForeign ELSE 0 END) AS ForeignCustomers,
+                SUM(ISNULL(CustomerNameThai, 0) + ISNULL(CustomerNameForeign, 0)) AS TotalCustomers
             FROM VisitorForm
             FOR JSON PATH, WITHOUT_ARRAY_WRAPPER
         )) AS VisitorSummary,

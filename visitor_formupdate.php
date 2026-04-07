@@ -804,171 +804,170 @@ $isAdmin = (is_array($perm) && in_array('Admin', $perm)) || $perm === 'Admin';
                             </div>
 
                             <!-- Option 2: ขอใช้บริการ Showroom (ซ่อนเริ่มต้น) -->
-                            <div id="corporateServicePanel" class="border rounded p-3 mb-3" style="display: none; background: #fafafa;">
-
-                                <!-- 2.1 เลือกวันที่ช่วงเวลา -->
-                                <div class="row mb-3">
-                                    <label class="col-sm-2 col-form-label fw-semibold">
-                                        <i class="ti ti-calendar fs-5 me-1"></i>วันที่
-                                    </label>
-                                    <div class="col-sm-4">
-                                        <input type="text" class="form-control corporate-date" id="corporateDate" placeholder="dd/mm/yyyy">
-                                    </div>
-                                </div>
-
-                                <!-- 2.2 ขอใช้บริการถ่ายรูป -->
-                                <div class="row mb-3">
-                                    <div class="col-12">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="usePhotoService">
-                                            <label class="form-check-label fw-semibold" for="usePhotoService">
-                                                <i class="ti ti-camera fs-5 me-1"></i>ขอใช้บริการถ่ายรูป
+                            <div id="corporateServicePanel" class="mb-3" style="display: none;">
+                                <div id="corporateBoxContainer">
+                                    <div class="corporate-box border rounded p-3 mb-2" style="background: #fafafa; position:relative;">
+                                        <button type="button" class="btn btn-sm btn-outline-danger corporate-box-remove" style="position:absolute;top:8px;right:8px;display:none;"><i class="ti ti-trash"></i></button>
+                                        <!-- 2.1 เลือกวันที่ช่วงเวลา -->
+                                        <div class="row mb-3">
+                                            <label class="col-sm-2 col-form-label fw-semibold">
+                                                <i class="ti ti-calendar fs-5 me-1"></i>วันที่
                                             </label>
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control corporate-date" placeholder="dd/mm/yyyy">
+                                            </div>
+                                        </div>
+
+                                        <!-- 2.2 ขอใช้บริการถ่ายรูป -->
+                                        <div class="row mb-3">
+                                            <div class="col-12">
+                                                <div class="form-check">
+                                                    <input class="form-check-input corp-usePhotoService" type="checkbox">
+                                                    <label class="form-check-label fw-semibold">
+                                                        <i class="ti ti-camera fs-5 me-1"></i>ขอใช้บริการถ่ายรูป
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="corp-photoServicePanel ms-4 border-start ps-3 mb-3" style="display: none;">
+                                            <div class="row mb-2">
+                                                <label class="col-sm-2 col-form-label">ช่วงเวลาถ่ายรูป</label>
+                                                <div class="col-sm-3">
+                                                    <input type="time" class="form-control corp-photoTimeStart">
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <input type="time" class="form-control corp-photoTimeEnd">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <label class="col-sm-2 col-form-label">สถานที่ถ่ายรูป</label>
+                                                <div class="col-sm-10 d-flex flex-wrap gap-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input corp-photoLoc" type="checkbox" value="showroom">
+                                                        <label class="form-check-label">Showroom</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input corp-photoLoc" type="checkbox" value="MP3">
+                                                        <label class="form-check-label">MP3</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input corp-photoLoc" type="checkbox" value="MP4">
+                                                        <label class="form-check-label">MP4</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input corp-photoLoc corp-photoLocOther" type="checkbox" value="other">
+                                                        <label class="form-check-label">อื่นๆ</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2 corp-photoLocOtherInput" style="display: none;">
+                                                <label class="col-sm-2 col-form-label"></label>
+                                                <div class="col-sm-10">
+                                                    <input type="text" class="form-control corp-photoLocOtherText" placeholder="ระบุสถานที่อื่นๆ">
+                                                </div>
+                                            </div>
+                                            <small class="text-warning"><i class="ti ti-info-circle me-1"></i>หมายเหตุ: กรุณาติดต่อโทร 3CX 6355 เมื่อถึงช่วงเวลาถ่าย</small>
+                                        </div>
+
+                                        <!-- 2.3 Welcome -->
+                                        <div class="row mb-3">
+                                            <div class="col-12">
+                                                <div class="form-check">
+                                                    <input class="form-check-input corp-useWelcomeService" type="checkbox">
+                                                    <label class="form-check-label fw-semibold">
+                                                        <i class="ti ti-message fs-5 me-1"></i>Welcome (ป้ายต้อนรับ)
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="corp-welcomeServicePanel ms-4 border-start ps-3 mb-3" style="display: none;">
+                                            <div class="row mb-2">
+                                                <label class="col-sm-2 col-form-label">ช่วงเวลา</label>
+                                                <div class="col-sm-3">
+                                                    <input type="time" class="form-control corp-welcomeTimeStart">
+                                                </div>
+                                                <div class="col-sm-3">
+                                                    <input type="time" class="form-control corp-welcomeTimeEnd">
+                                                </div>
+                                            </div>
+                                            <div class="row mb-2">
+                                                <label class="col-sm-2 col-form-label">รายละเอียด</label>
+                                                <div class="col-sm-10">
+                                                    <textarea class="form-control corp-welcomeDetail" rows="2"></textarea>
+                                                </div>
+                                            </div>
+                                            <small class="text-muted mb-2"><i class="ti ti-info-circle me-1"></i>หมายเหตุ: ระบุชื่อบริษัท / ชื่อ-นามสกุลลูกค้า / ตำแหน่ง / อื่นๆ โปรดระบุ</small>
+
+                                            <div class="mt-3">
+                                                <label class="col-form-label fw-semibold">เลือกหน้าจอแสดงผล:</label>
+                                                <div class="border rounded p-2 mb-2">
+                                                    <label class="fw-semibold d-block mb-2">MP1</label>
+                                                    <div class="ms-3 d-flex flex-wrap gap-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input corp-screen" type="checkbox" value="TV MP1" data-mp="MP1">
+                                                            <label class="form-check-label">TV MP1</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="border rounded p-2 mb-2">
+                                                    <label class="fw-semibold d-block mb-2">MP2</label>
+                                                    <div class="ms-3 d-flex flex-wrap gap-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input corp-screen" type="checkbox" value="TV ห้องอาหาร" data-mp="MP2">
+                                                            <label class="form-check-label">TV ห้องอาหาร</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input corp-screen" type="checkbox" value="TV VIP1" data-mp="MP2">
+                                                            <label class="form-check-label">TV VIP1</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input corp-screen" type="checkbox" value="TV VIP2" data-mp="MP2">
+                                                            <label class="form-check-label">TV VIP2</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="border rounded p-2 mb-2">
+                                                    <label class="fw-semibold d-block mb-2">MP3</label>
+                                                    <div class="ms-3 d-flex flex-wrap gap-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input corp-screen" type="checkbox" value="TV บริเวณโซฟา" data-mp="MP3">
+                                                            <label class="form-check-label">TV บริเวณโซฟา</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input corp-screen" type="checkbox" value="TV Room1" data-mp="MP3">
+                                                            <label class="form-check-label">TV Room1</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input corp-screen" type="checkbox" value="TV Room2" data-mp="MP3">
+                                                            <label class="form-check-label">TV Room2</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input corp-screen" type="checkbox" value="TV Room3" data-mp="MP3">
+                                                            <label class="form-check-label">TV Room3</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input corp-screen" type="checkbox" value="LED Wall" data-mp="MP3">
+                                                            <label class="form-check-label">LED Wall</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="border rounded p-2 mb-2">
+                                                    <label class="fw-semibold d-block mb-2">MP4</label>
+                                                    <div class="ms-3 d-flex flex-wrap gap-3">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input corp-screen" type="checkbox" value="LED Wall" data-mp="MP4">
+                                                            <label class="form-check-label">LED Wall</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                                <div id="photoServicePanel" class="ms-4 border-start ps-3 mb-3" style="display: none;">
-                                    <div class="row mb-2">
-                                        <label class="col-sm-2 col-form-label">ช่วงเวลาถ่ายรูป</label>
-                                        <div class="col-sm-3">
-                                            <input type="time" class="form-control" id="photoTimeStart">
-                                        </div>
-                                        <div class="col-sm-3">
-                                            <input type="time" class="form-control" id="photoTimeEnd">
-                                        </div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <label class="col-sm-2 col-form-label">สถานที่ถ่ายรูป</label>
-                                        <div class="col-sm-10 d-flex flex-wrap gap-3">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="photoLocShowroom" value="showroom">
-                                                <label class="form-check-label" for="photoLocShowroom">Showroom</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="photoLocMP3" value="MP3">
-                                                <label class="form-check-label" for="photoLocMP3">MP3</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="photoLocMP4" value="MP4">
-                                                <label class="form-check-label" for="photoLocMP4">MP4</label>
-                                            </div>
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" id="photoLocOther" value="other">
-                                                <label class="form-check-label" for="photoLocOther">อื่นๆ</label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="row mb-2" id="photoLocOtherInput" style="display: none;">
-                                        <label class="col-sm-2 col-form-label"></label>
-                                        <div class="col-sm-10">
-                                            <input type="text" class="form-control" id="photoLocOtherText" placeholder="ระบุสถานที่อื่นๆ">
-                                        </div>
-                                    </div>
-                                    <small class="text-warning"><i class="ti ti-info-circle me-1"></i>หมายเหตุ: กรุณาติดต่อโทร 3CX 6355 เมื่อถึงช่วงเวลาถ่าย</small>
+                                <div class="d-flex gap-2 mt-2">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btnAddCorpDay"><i class="ti ti-calendar-plus me-1"></i>เพิ่มวัน</button>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnAddCorpClone"><i class="ti ti-copy me-1"></i>เพิ่มข้อมูลเดิม</button>
                                 </div>
-
-                                <!-- 2.3 Welcome -->
-                                <div class="row mb-3">
-                                    <div class="col-12">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="useWelcomeService">
-                                            <label class="form-check-label fw-semibold" for="useWelcomeService">
-                                                <i class="ti ti-message fs-5 me-1"></i>Welcome (ป้ายต้อนรับ)
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="welcomeServicePanel" class="ms-4 border-start ps-3 mb-3" style="display: none;">
-                                    <div class="row mb-2">
-                                        <label class="col-sm-2 col-form-label">ช่วงเวลา</label>
-                                        <div class="col-sm-3">
-                                            <input type="time" class="form-control" id="welcomeTimeStart">
-                                        </div>
-                                        <div class="col-sm-3">
-                                            <input type="time" class="form-control" id="welcomeTimeEnd">
-                                        </div>
-                                    </div>
-                                    <div class="row mb-2">
-                                        <label class="col-sm-2 col-form-label">รายละเอียด</label>
-                                        <div class="col-sm-10">
-                                            <textarea class="form-control" id="welcomeDetail" rows="2"></textarea>
-                                        </div>
-                                    </div>
-                                    <small class="text-muted mb-2"><i class="ti ti-info-circle me-1"></i>หมายเหตุ: ระบุชื่อบริษัท / ชื่อ-นามสกุลลูกค้า / ตำแหน่ง / อื่นๆ โปรดระบุ</small>
-
-                                    <div class="mt-3">
-                                        <label class="col-form-label fw-semibold">เลือกหน้าจอแสดงผล:</label>
-
-                                        <!-- MP1 -->
-                                        <div class="border rounded p-2 mb-2">
-                                            <label class="fw-semibold d-block mb-2">MP1</label>
-                                            <div class="ms-3 d-flex flex-wrap gap-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="welcomeMP1_TV" value="TV MP1">
-                                                    <label class="form-check-label" for="welcomeMP1_TV">TV MP1</label>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- MP2 -->
-                                        <div class="border rounded p-2 mb-2">
-                                            <label class="fw-semibold d-block mb-2">MP2</label>
-                                            <div class="ms-3 d-flex flex-wrap gap-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="welcomeMP2_Food" value="TV ห้องอาหาร">
-                                                    <label class="form-check-label" for="welcomeMP2_Food">TV ห้องอาหาร</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="welcomeMP2_VIP1" value="TV VIP1">
-                                                    <label class="form-check-label" for="welcomeMP2_VIP1">TV VIP1</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="welcomeMP2_VIP2" value="TV VIP2">
-                                                    <label class="form-check-label" for="welcomeMP2_VIP2">TV VIP2</label>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- MP3 -->
-                                        <div class="border rounded p-2 mb-2">
-                                            <label class="fw-semibold d-block mb-2">MP3</label>
-                                            <div class="ms-3 d-flex flex-wrap gap-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="welcomeMP3_Sofa" value="TV บริเวณโซฟา">
-                                                    <label class="form-check-label" for="welcomeMP3_Sofa">TV บริเวณโซฟา</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="welcomeMP3_Room1" value="TV Room1">
-                                                    <label class="form-check-label" for="welcomeMP3_Room1">TV Room1</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="welcomeMP3_Room2" value="TV Room2">
-                                                    <label class="form-check-label" for="welcomeMP3_Room2">TV Room2</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="welcomeMP3_Room3" value="TV Room3">
-                                                    <label class="form-check-label" for="welcomeMP3_Room3">TV Room3</label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="welcomeMP3_LED" value="LED Wall">
-                                                    <label class="form-check-label" for="welcomeMP3_LED">LED Wall</label>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <!-- MP4 -->
-                                        <div class="border rounded p-2 mb-2">
-                                            <label class="fw-semibold d-block mb-2">MP4</label>
-                                            <div class="ms-3 d-flex flex-wrap gap-3">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="checkbox" id="welcomeMP4_LED" value="LED Wall">
-                                                    <label class="form-check-label" for="welcomeMP4_LED">LED Wall</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
                     </div>
@@ -1832,78 +1831,62 @@ endif; ?>
         // =====================================================
         // COLLECT CORPORATE DETAIL (ฝ่ายสื่อสาร)
         // =====================================================
+        function collectCorporateBoxData(box) {
+            const entry = {};
+            entry.date = box.find('.corporate-date').val() || '';
+
+            entry.usePhotoService = box.find('.corp-usePhotoService').is(':checked');
+            if (entry.usePhotoService) {
+                entry.photoTimeStart = box.find('.corp-photoTimeStart').val() || '';
+                entry.photoTimeEnd = box.find('.corp-photoTimeEnd').val() || '';
+                entry.photoLocations = [];
+                box.find('.corp-photoLoc:checked').each(function() {
+                    const val = $(this).val();
+                    if (val === 'other') {
+                        entry.photoLocations.push(box.find('.corp-photoLocOtherText').val() || 'อื่นๆ');
+                    } else {
+                        entry.photoLocations.push(val);
+                    }
+                });
+            }
+
+            entry.useWelcomeService = box.find('.corp-useWelcomeService').is(':checked');
+            if (entry.useWelcomeService) {
+                entry.welcomeTimeStart = box.find('.corp-welcomeTimeStart').val() || '';
+                entry.welcomeTimeEnd = box.find('.corp-welcomeTimeEnd').val() || '';
+                entry.welcomeDetail = box.find('.corp-welcomeDetail').val() || '';
+                entry.screens = {};
+                box.find('.corp-screen:checked').each(function() {
+                    const mp = $(this).data('mp');
+                    if (!entry.screens[mp]) entry.screens[mp] = [];
+                    entry.screens[mp].push($(this).val());
+                });
+            }
+
+            return entry;
+        }
+
         function collectCorporateDetail() {
             const corporateData = {
                 serviceType: $('input[name="corporateServiceType"]:checked').val() || 'no_service'
             };
 
-            console.log(corporateData);
-
             if (corporateData.serviceType === 'use_service') {
-                // Date and time
-                corporateData.date = $('#corporateDate').val() || '';
-
-                // Photo service
-                corporateData.usePhotoService = $('#usePhotoService').is(':checked');
-                if (corporateData.usePhotoService) {
-                    corporateData.photoTimeStart = $('#photoTimeStart').val() || '';
-                    corporateData.photoTimeEnd = $('#photoTimeEnd').val() || '';
-                    corporateData.photoLocations = [];
-                    $('#photoServicePanel input[type="checkbox"]:checked').each(function() {
-                        const val = $(this).val();
-                        if (val === 'other') {
-                            corporateData.photoLocations.push($('#photoLocOtherText').val() || 'อื่นๆ');
-                        } else {
-                            corporateData.photoLocations.push(val);
-                        }
-                    });
-                }
-
-                // Welcome service
-                corporateData.useWelcomeService = $('#useWelcomeService').is(':checked');
-                if (corporateData.useWelcomeService) {
-                    corporateData.welcomeTimeStart = $('#welcomeTimeStart').val() || '';
-                    corporateData.welcomeTimeEnd = $('#welcomeTimeEnd').val() || '';
-                    corporateData.welcomeDetail = $('#welcomeDetail').val() || '';
-
-                    // Collect screen options (ไม่มี checkbox หลักแล้ว)
-                    corporateData.screens = {};
-
-                    // MP1
-                    const mp1Screens = [];
-                    $('#welcomeMP1_TV:checked').each(function() {
-                        mp1Screens.push($(this).val());
-                    });
-                    if (mp1Screens.length > 0) {
-                        corporateData.screens.MP1 = mp1Screens;
+                const entries = [];
+                const seen = new Set();
+                $('#corporateBoxContainer .corporate-box').each(function() {
+                    const entry = collectCorporateBoxData($(this));
+                    const key = JSON.stringify(entry);
+                    if (!seen.has(key)) {
+                        seen.add(key);
+                        entries.push(entry);
                     }
+                });
+                corporateData.entries = entries;
 
-                    // MP2
-                    const mp2Screens = [];
-                    $('#welcomeMP2_Food:checked, #welcomeMP2_VIP1:checked, #welcomeMP2_VIP2:checked').each(function() {
-                        mp2Screens.push($(this).val());
-                    });
-                    if (mp2Screens.length > 0) {
-                        corporateData.screens.MP2 = mp2Screens;
-                    }
-
-                    // MP3
-                    const mp3Screens = [];
-                    $('#welcomeMP3_Sofa:checked, #welcomeMP3_Room1:checked, #welcomeMP3_Room2:checked, #welcomeMP3_Room3:checked, #welcomeMP3_LED:checked').each(function() {
-                        mp3Screens.push($(this).val());
-                    });
-                    if (mp3Screens.length > 0) {
-                        corporateData.screens.MP3 = mp3Screens;
-                    }
-
-                    // MP4
-                    const mp4Screens = [];
-                    $('#welcomeMP4_LED:checked').each(function() {
-                        mp4Screens.push($(this).val());
-                    });
-                    if (mp4Screens.length > 0) {
-                        corporateData.screens.MP4 = mp4Screens;
-                    }
+                // Backward compatibility: keep first entry's fields at top level
+                if (entries.length > 0) {
+                    Object.assign(corporateData, entries[0]);
                 }
             }
 
@@ -2293,7 +2276,8 @@ endif; ?>
                                     Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: res.message });
                                 }
                             },
-                            error: function() {
+                            error: function(jqXHR, textStatus, errorThrown) {
+                                console.error('AJAX Error:', textStatus, errorThrown, jqXHR.responseText);
                                 Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ไม่สามารถเชื่อมต่อ API ได้' });
                             }
                         });
@@ -2422,32 +2406,72 @@ endif; ?>
             }
         });
 
-        // Toggle photo service panel  
-        $(document).on('change', '#usePhotoService', function() {
+        // Toggle photo service panel (class-based for multi-box)
+        $(document).on('change', '.corp-usePhotoService', function() {
+            const panel = $(this).closest('.corporate-box').find('.corp-photoServicePanel');
             if ($(this).is(':checked')) {
-                $('#photoServicePanel').slideDown(300);
+                panel.slideDown(300);
             } else {
-                $('#photoServicePanel').slideUp(300);
+                panel.slideUp(300);
             }
         });
 
-        // Toggle welcome service panel
-        $(document).on('change', '#useWelcomeService', function() {
+        // Toggle welcome service panel (class-based for multi-box)
+        $(document).on('change', '.corp-useWelcomeService', function() {
+            const panel = $(this).closest('.corporate-box').find('.corp-welcomeServicePanel');
             if ($(this).is(':checked')) {
-                $('#welcomeServicePanel').slideDown(300);
+                panel.slideDown(300);
             } else {
-                $('#welcomeServicePanel').slideUp(300);
+                panel.slideUp(300);
             }
         });
 
-        // Toggle photo location "อื่นๆ" input field
-        $(document).on('change', '#photoLocOther', function() {
+        // Toggle photo location "อื่นๆ" input field (class-based for multi-box)
+        $(document).on('change', '.corp-photoLocOther', function() {
+            const row = $(this).closest('.corporate-box').find('.corp-photoLocOtherInput');
             if ($(this).is(':checked')) {
-                $('#photoLocOtherInput').slideDown(200);
+                row.slideDown(200);
             } else {
-                $('#photoLocOtherInput').slideUp(200);
-                $('#photoLocOtherText').val('');
+                row.slideUp(200);
+                row.find('.corp-photoLocOtherText').val('');
             }
+        });
+
+        // Remove corporate box
+        $(document).on('click', '.corporate-box-remove', function() {
+            const container = $('#corporateBoxContainer');
+            if (container.find('.corporate-box').length > 1) {
+                $(this).closest('.corporate-box').slideUp(300, function() { $(this).remove(); updateCorpRemoveButtons(); });
+            }
+        });
+
+        function updateCorpRemoveButtons() {
+            const boxes = $('#corporateBoxContainer .corporate-box');
+            boxes.find('.corporate-box-remove').toggle(boxes.length > 1);
+        }
+
+        // เพิ่มวัน — clone blank box
+        $(document).on('click', '#btnAddCorpDay', function() {
+            const template = $('#corporateBoxContainer .corporate-box:first').clone(false);
+            template.find('input[type="text"], input[type="time"], textarea').val('');
+            template.find('input[type="checkbox"]').prop('checked', false);
+            template.find('.corp-photoServicePanel, .corp-welcomeServicePanel, .corp-photoLocOtherInput').hide();
+            template.hide();
+            $('#corporateBoxContainer').append(template);
+            template.slideDown(300);
+            updateCorpRemoveButtons();
+        });
+
+        // เพิ่มข้อมูลเดิม — clone with data from last box
+        $(document).on('click', '#btnAddCorpClone', function() {
+            const lastBox = $('#corporateBoxContainer .corporate-box:last');
+            const cloned = lastBox.clone(true);
+            // Clear only date so user picks a new day
+            cloned.find('.corporate-date').val('');
+            cloned.hide();
+            $('#corporateBoxContainer').append(cloned);
+            cloned.slideDown(300);
+            updateCorpRemoveButtons();
         });
 
         // =====================================================
@@ -2782,11 +2806,20 @@ endif; ?>
                     },
                     dataType: 'json',
                     success: function(response) {
+                        // Only exclude rooms selected by other cards on the same date with overlapping time
                         const selectedRooms = [];
+                        const currentDate = card.find('.dateTrival').val();
+                        const currentStart = card.find('input[name="meeting_time_start[]"]').val();
+                        const currentEnd = card.find('input[name="meeting_time_end[]"]').val();
                         $('#schedule-container .schedule-card').each(function() {
                             if ($(this).is(card)) return;
+                            const otherDate = $(this).find('.dateTrival').val();
+                            const otherStart = $(this).find('input[name="meeting_time_start[]"]').val();
+                            const otherEnd = $(this).find('input[name="meeting_time_end[]"]').val();
                             const val = $(this).find('.meetingroom').val();
-                            if (val) selectedRooms.push(val);
+                            if (val && otherDate === currentDate && otherStart < currentEnd && otherEnd > currentStart) {
+                                selectedRooms.push(val);
+                            }
                         });
 
                         select.empty().prop('disabled', false);
@@ -3268,6 +3301,7 @@ endif; ?>
                             }
                         },
                         error: (xhr, status, err) => {
+                            console.log('AJAX Error:', xhr);
                             Swal.close();
                             let detail = '';
                             if (xhr.responseText) {
@@ -3325,13 +3359,15 @@ endif; ?>
                                 Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: r2.message });
                             }
                         },
-                        error: () => {
+                        error: (err) => {
+                            console.log(err);
                             Swal.close();
                             Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ไม่สามารถเชื่อมต่อ API ได้' });
                         }
                     });
                 },
-                error: () => {
+                error: (err) => {
+                    console.error('AJAX Error:', err);
                     Swal.close();
                     Swal.fire({ icon: 'error', title: 'ผิดพลาด', text: 'ไม่สามารถเชื่อมต่อ API ได้' });
                 }
@@ -3392,7 +3428,8 @@ endif; ?>
                                 });
                             }
                         },
-                        error: () => {
+                        error: (err) => {
+                            console.error('AJAX Error:', err);
                             Swal.close();
                             Swal.fire({
                                 icon: 'error',
@@ -3445,7 +3482,8 @@ endif; ?>
                                 });
                             }
                         },
-                        error: () => {
+                        error: (err) => {
+                            console.error('AJAX Error:', err);
                             Swal.close();
                             Swal.fire({
                                 icon: 'error',
@@ -3461,7 +3499,7 @@ endif; ?>
         function setFormReadOnly(isReadOnly) {
             if (isReadOnly) {
                 // Disable all inputs
-                $('input, textarea, select').not('#commentText').prop('disabled', true);
+                $('input, textarea, select').not('#commentText, #prdAckModal input, #prdAckModal textarea').prop('disabled', true);
                 // Hide add buttons
                 $('.btn-add-job, .btn-add-job-no, .btn-add-schedule, #btnAddRow, #addSchedule, .removeRow, .btn-remove-job-row, .upload-area, .removeJobBtn').hide();
                 // Disable Select2
@@ -3873,42 +3911,59 @@ endif; ?>
 
                 if (corp.serviceType === 'use_service') {
                     $('#corporateUseService').prop('checked', true).trigger('change');
-                    $('#corporateDate').val(corp.date);
 
-                    if (corp.usePhotoService) {
-                        $('#usePhotoService').prop('checked', true).trigger('change');
-                        $('#photoTimeStart').val(corp.photoTimeStart);
-                        $('#photoTimeEnd').val(corp.photoTimeEnd);
-                        (corp.photoLocations || []).forEach(loc => {
-                            if (loc === 'showroom') $('#photoLocShowroom').prop('checked', true);
-                            else if (['MP3', 'MP4'].includes(loc)) $(`#photoLoc${loc}`).prop('checked', true);
-                            else {
-                                $('#photoLocOther').prop('checked', true).trigger('change');
-                                $('#photoLocOtherText').val(loc);
-                            }
-                        });
-                    }
+                    // Build entries array (backward compat: old format has no entries array)
+                    const corpEntries = corp.entries || [corp];
 
-                    if (corp.useWelcomeService) {
-                        $('#useWelcomeService').prop('checked', true).trigger('change');
-                        $('#welcomeTimeStart').val(corp.welcomeTimeStart);
-                        $('#welcomeTimeEnd').val(corp.welcomeTimeEnd);
-                        $('#welcomeDetail').val(corp.welcomeDetail);
+                    corpEntries.forEach((entry, idx) => {
+                        let box;
+                        if (idx === 0) {
+                            box = $('#corporateBoxContainer .corporate-box:first');
+                        } else {
+                            box = $('#corporateBoxContainer .corporate-box:first').clone(false);
+                            box.find('input[type="text"], input[type="time"], textarea').val('');
+                            box.find('input[type="checkbox"]').prop('checked', false);
+                            box.find('.corp-photoServicePanel, .corp-welcomeServicePanel, .corp-photoLocOtherInput').hide();
+                            $('#corporateBoxContainer').append(box);
+                        }
 
-                        // เลือกหน้าจอแสดงผล
-                        if (corp.screens) {
-                            // วนลูปผ่านทุก MP (MP1, MP2, MP3, MP4)
-                            for (const mpKey of ['MP1', 'MP2', 'MP3', 'MP4']) {
-                                if (corp.screens[mpKey] && Array.isArray(corp.screens[mpKey])) {
-                                    for (const screenValue of corp.screens[mpKey]) {
-                                        // เช็คจากทั้ง value และ id prefix (label for)
-                                        // เช่น id="welcomeMP3_LED" มี value="LED Wall"
-                                        $(`#welcomeServicePanel input[id^="welcome${mpKey}_"][value="${screenValue}"]`).prop('checked', true);
+                        box.find('.corporate-date').val(entry.date || '');
+
+                        if (entry.usePhotoService) {
+                            box.find('.corp-usePhotoService').prop('checked', true);
+                            box.find('.corp-photoServicePanel').show();
+                            box.find('.corp-photoTimeStart').val(entry.photoTimeStart || '');
+                            box.find('.corp-photoTimeEnd').val(entry.photoTimeEnd || '');
+                            (entry.photoLocations || []).forEach(loc => {
+                                if (loc === 'showroom' || loc === 'MP3' || loc === 'MP4') {
+                                    box.find(`.corp-photoLoc[value="${loc}"]`).prop('checked', true);
+                                } else {
+                                    box.find('.corp-photoLocOther').prop('checked', true);
+                                    box.find('.corp-photoLocOtherInput').show();
+                                    box.find('.corp-photoLocOtherText').val(loc);
+                                }
+                            });
+                        }
+
+                        if (entry.useWelcomeService) {
+                            box.find('.corp-useWelcomeService').prop('checked', true);
+                            box.find('.corp-welcomeServicePanel').show();
+                            box.find('.corp-welcomeTimeStart').val(entry.welcomeTimeStart || '');
+                            box.find('.corp-welcomeTimeEnd').val(entry.welcomeTimeEnd || '');
+                            box.find('.corp-welcomeDetail').val(entry.welcomeDetail || '');
+
+                            if (entry.screens) {
+                                for (const mpKey of ['MP1', 'MP2', 'MP3', 'MP4']) {
+                                    if (entry.screens[mpKey] && Array.isArray(entry.screens[mpKey])) {
+                                        for (const screenValue of entry.screens[mpKey]) {
+                                            box.find(`.corp-screen[data-mp="${mpKey}"][value="${screenValue}"]`).prop('checked', true);
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
+                    });
+                    updateCorpRemoveButtons();
                 }
 
                 // --- 6. Lecturer Detail ---

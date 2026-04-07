@@ -43,7 +43,7 @@ function genFatCode() {
     global $konnext_fat;
     $sql = "SELECT SUBSTRING(MAX(fat_projectcode), 9, 4) AS lastdocno
             FROM fat_projectmaster
-            WHERE CONVERT(DateCreate, DATE) BETWEEN '" . date('Y-m-01') . "' AND '" . date('Y-m-31') . "'
+            WHERE CONVERT(DateCreate, DATE) BETWEEN '" . date('Y-m-01') . "' AND '" . date('Y-m-t') . "'
             LIMIT 1";
     $q = mysqli_query($konnext_fat, $sql);
     $prefix = "FAT-" . substr((string)(date('Y') + 543), 2, 2) . date('m');
@@ -172,7 +172,7 @@ function insertFatFromVisitorForm($visitorFormId) {
                 '" . $e($fat_owner) . "',
                 '', '', '', '',
                 '" . $e($jobNo) . "',
-                '',
+                NULL,
                 '" . $e($salename) . "',
                 '" . $e($jobvalue) . "',
                 '" . $e($sn_no) . "',
@@ -308,9 +308,7 @@ if ($action === 'acknowledge') {
     if ((int)$divisionCode === 87 || isAdmin($userPerm)) {
         ob_start();
         $fatCodes = insertFatFromVisitorForm($visitorFormId);
-        // print_r($fatCodes);
-        // exit();
-        $captured = ob_get_clean(); // capture any PHP warnings/notices instead of letting them corrupt JSON
+        $captured = ob_get_clean();
         if (!empty(trim($captured))) {
             $fatWarning = 'เกิดข้อผิดพลาดขณะสร้าง FAT: ' . trim(strip_tags($captured));
         }
@@ -361,14 +359,39 @@ if ($action === 'close_job') {
         exit;
     }
 
-    // ตรวจสอบว่ารับทราบครบหรือยัง
-    $countSql = "SELECT COUNT(*) as acked FROM VisitorAcknowledg WHERE VisitorFormId = ? AND IsAcknowledged = 1";
-    $countStmt = sqlsrv_query($konnext_DB64, $countSql, [$visitorFormId]);
-    $countRow = sqlsrv_fetch_array($countStmt, SQLSRV_FETCH_ASSOC);
+    // Determine which divisions are required based on form data
+    $formSql2 = "SELECT CorporateDetail, Travel FROM VisitorForm WHERE Id = ?";
+    $formStmt2 = sqlsrv_query($konnext_DB64, $formSql2, [$visitorFormId]);
+    $formData2 = sqlsrv_fetch_array($formStmt2, SQLSRV_FETCH_ASSOC);
 
-    if ((int)$countRow['acked'] < count($DIVISIONS)) {
-        echo json_encode(["status" => false, "message" => "ยังรับทราบไม่ครบทุกฝ่าย"]);
-        exit;
+    $corp = json_decode($formData2['CorporateDetail'] ?? '{}', true) ?: [];
+    $travel = json_decode($formData2['Travel'] ?? '[]', true) ?: [];
+
+    $showSueasarn = ($corp['serviceType'] ?? '') === 'use_service';
+    $showTransport = is_array($travel) && in_array('Provide', $travel);
+
+    // Build list of required division codes (skip PRD=83, conditionally skip 63 and 65)
+    $requiredDivisions = [];
+    foreach ($DIVISIONS as $code => $name) {
+        if ($code == 83) continue; // PRD is separate
+        if ($code == 63 && !$showSueasarn) continue;
+        if ($code == 65 && !$showTransport) continue;
+        $requiredDivisions[] = $code;
+    }
+
+    // ตรวจสอบว่ารับทราบครบฝ่ายที่เกี่ยวข้องหรือยัง
+    $requiredCount = count($requiredDivisions);
+    if ($requiredCount > 0) {
+        $placeholders = implode(',', array_fill(0, $requiredCount, '?'));
+        $countSql = "SELECT COUNT(*) as acked FROM VisitorAcknowledg WHERE VisitorFormId = ? AND IsAcknowledged = 1 AND DivisionCode IN ($placeholders)";
+        $countParams = array_merge([$visitorFormId], $requiredDivisions);
+        $countStmt = sqlsrv_query($konnext_DB64, $countSql, $countParams);
+        $countRow = sqlsrv_fetch_array($countStmt, SQLSRV_FETCH_ASSOC);
+
+        if ((int)$countRow['acked'] < $requiredCount) {
+            echo json_encode(["status" => false, "message" => "ยังรับทราบไม่ครบทุกฝ่าย"]);
+            exit;
+        }
     }
 
     // Update Status เป็น 6 (Closed)

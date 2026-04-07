@@ -57,7 +57,7 @@
         0: "Draft",
         1: "New",
         2: "Acept",
-        3: "Approvoed",
+        3: "Approved",
         4: "Rework",
         5: "Submit",
         6: "Closed",

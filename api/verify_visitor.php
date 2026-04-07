@@ -61,8 +61,8 @@ try {
         $phoneWithout0 = $phone;
     }
 
-    // Get VisitorForm with SalesDetail and VisitorSchedule (SQL Server)
-    $sql = "SELECT vf.SalesDetail, vf.UserCreated, vs.VisitDate, vs.TimeStart, vs.TimeEnd
+    // Get VisitorForm with SalesDetail, CorporateDetail and VisitorSchedule (SQL Server)
+    $sql = "SELECT vf.SalesDetail, vf.CorporateDetail, vf.UserCreated, vf.DocNo, vs.VisitDate, vs.TimeStart, vs.TimeEnd
             FROM VisitorForm vf
             LEFT JOIN VisitorSchedule vs ON vs.VisitorFormId = vf.Id
             WHERE vf.Id = ?";
@@ -172,16 +172,58 @@ try {
         }
     }
 
-    // Format date
-    $visitDate = isset($data['VisitDate']) ? $data['VisitDate'] : '';
-    if ($visitDate) {
-        if ($visitDate instanceof DateTime) {
-            $dt = $visitDate;
-        } else {
-            $dt = new DateTime($visitDate);
+    // Format date from CorporateDetail
+    $corpDetailJson = isset($data['CorporateDetail']) ? $data['CorporateDetail'] : '{}';
+    $corpDetail = json_decode($corpDetailJson, true);
+    $corpDates = array();
+    
+    if (is_array($corpDetail)) {
+        $entries = array();
+        if (isset($corpDetail['entries']) && is_array($corpDetail['entries'])) {
+            $entries = $corpDetail['entries'];
+        } elseif (isset($corpDetail['date'])) {
+            $entries[] = $corpDetail;
         }
+        
+        foreach ($entries as $entry) {
+            if (!empty($entry['date'])) {
+                if (!in_array($entry['date'], $corpDates)) {
+                    $corpDates[] = $entry['date'];
+                }
+            }
+        }
+    }
+    
+    // Format date output
+    if (count($corpDates) > 0) {
+        $formattedDates = array();
         $thaiMonths = array('', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.');
-        $visitDate = $dt->format('j') . ' ' . $thaiMonths[(int)$dt->format('n')] . ' ' . ($dt->format('Y') + 543);
+        
+        foreach ($corpDates as $d) {
+            $parts = explode('/', $d);
+            if (count($parts) === 3) {
+                $day = intval($parts[0]);
+                $month = intval($parts[1]);
+                $year = intval($parts[2]);
+                $thaiYear = $year + 543;
+                $formattedDates[] = "$day " . $thaiMonths[$month] . " $thaiYear";
+            } else {
+                $formattedDates[] = $d;
+            }
+        }
+        $visitDate = implode(', ', $formattedDates);
+    } else {
+        // Fallback to VisitorSchedule
+        $visitDate = isset($data['VisitDate']) ? $data['VisitDate'] : '';
+        if ($visitDate) {
+            if ($visitDate instanceof DateTime) {
+                $dt = $visitDate;
+            } else {
+                $dt = new DateTime($visitDate);
+            }
+            $thaiMonths = array('', 'ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.');
+            $visitDate = $dt->format('j') . ' ' . $thaiMonths[(int)$dt->format('n')] . ' ' . ($dt->format('Y') + 543);
+        }
     }
 
     // ดึงชื่อผู้ร้องขอ (UserCreated) จาก mydata
@@ -189,9 +231,12 @@ try {
     $requesterData = $requesterCode ? mydata($requesterCode) : null;
     $salesName = ($requesterData && isset($requesterData['FullName'])) ? $requesterData['FullName'] : 'ทีมงาน ASEFA';
 
+    $docNo = isset($data['DocNo']) ? $data['DocNo'] : '';
+
     echo json_encode(array(
         'success' => true,
         'name' => $customerName,
+        'doc_no' => $docNo,
         'visit_date' => $visitDate ? $visitDate : 'ยังไม่ได้กำหนด',
         'visit_time' => $timeStr ? $timeStr : 'ยังไม่ได้กำหนด',
         'zone' => $zone ? $zone : 'ยังไม่ได้กำหนด',

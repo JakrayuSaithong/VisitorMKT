@@ -14,66 +14,152 @@ include_once 'config/base.php';
     <?php include('css.php'); ?>
 
     <style>
+        body, .content {
+            background-color: #f1f8ffff !important; /* Soft Slate-50 background */
+        }
+
         canvas { max-height: 280px; }
 
         .dashboard-card {
             height: 100%;
-            border: none;
-            border-radius: var(--md-shape-md);
-            background: var(--md-surface);
+            border: 1px solid #e2e8f0; /* Crisp slate-200 border */
+            border-radius: 16px;
+            background: #ffffff;
             position: relative;
             overflow: hidden;
-            transition: all 0.25s ease;
-            box-shadow: var(--md-elevation-1);
-            border-left: 4px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            display: flex;
+            align-items: center;
+            padding: 1.5rem;
+            gap: 1.25rem;
         }
 
         .dashboard-card:hover {
-            box-shadow: var(--md-elevation-3);
-            transform: translateY(-3px);
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04);
+            transform: translateY(-4px);
+            border-bottom-color: transparent;
         }
 
         .icon-box {
-            width: 52px;
-            height: 52px;
-            border-radius: var(--md-shape-md);
+            width: 56px;
+            height: 56px;
+            flex-shrink: 0;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            transition: all 0.2s ease;
+            font-size: 28px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .icon-new { background: linear-gradient(135deg, #d3e3fd, #a8c7fa); color: #041e49; }
-        .icon-accept { background: linear-gradient(135deg, #b8f0cb, #7ee4a0); color: #00391a; }
-        .icon-closed { background: linear-gradient(135deg, #dce4ef, #b8c6d9); color: #1a2633; }
-        .icon-visitor { background: linear-gradient(135deg, #ede9fe, #c4b5fd); color: #5b21b6; }
-        .icon-quiz { background: linear-gradient(135deg, #fef3c7, #fcd34d); color: #92400e; }
-        .icon-objective { background: linear-gradient(135deg, #d1fae5, #6ee7b7); color: #065f46; }
+        .dashboard-card:hover .icon-box {
+            transform: scale(1.1) rotate(5deg);
+        }
 
-        .dashboard-card.card-new { border-left-color: var(--md-primary); }
-        .dashboard-card.card-accept { border-left-color: var(--md-tertiary); }
-        .dashboard-card.card-closed { border-left-color: var(--md-secondary); }
-        .dashboard-card.card-visitor { border-left-color: #7c3aed; }
-        .dashboard-card.card-quiz { border-left-color: #f9ab00; }
-        .dashboard-card.card-objective { border-left-color: #059669; }
+        /* Colorful SaaS Accents */
+        .card-new { border-bottom: 4px solid transparent; }
+        .card-new .icon-box { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .card-new:hover { border-bottom-color: #3b82f6; }
+
+        .card-accept { border-bottom: 4px solid transparent; }
+        .card-accept .icon-box { background: rgba(6, 182, 212, 0.15); color: #06b6d4; }
+        .card-accept:hover { border-bottom-color: #06b6d4; }
+
+        .card-approved { border-bottom: 4px solid transparent; }
+        .card-approved .icon-box { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .card-approved:hover { border-bottom-color: #10b981; }
+
+        .card-submit { border-bottom: 4px solid transparent; }
+        .card-submit .icon-box { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .card-submit:hover { border-bottom-color: #f59e0b; }
+
+        .card-closed { border-bottom: 4px solid transparent; }
+        .card-closed .icon-box { background: rgba(100, 116, 139, 0.15); color: #64748b; }
+        .card-closed:hover { border-bottom-color: #64748b; }
+
+        .card-visitor { border-bottom: 4px solid transparent; }
+        .card-visitor .icon-box { background: rgba(99, 102, 241, 0.15); color: #6366f1; }
+        .card-visitor:hover { border-bottom-color: #6366f1; }
+
+        .card-quiz { border-bottom: 4px solid transparent; }
+        .card-quiz .icon-box { background: rgba(244, 63, 94, 0.15); color: #f43f5e; }
+        .card-quiz:hover { border-bottom-color: #f43f5e; }
+
+        .card-objective { border-bottom: 4px solid transparent; }
+        .card-objective .icon-box { background: rgba(139, 92, 246, 0.15); color: #8b5cf6; }
+        .card-objective:hover { border-bottom-color: #8b5cf6; }
+
+        .card-content {
+            flex-grow: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
 
         .dashboard-card p {
             font-size: 13px;
-            color: var(--md-on-surface-variant);
-            margin-bottom: 4px;
-            font-weight: 500;
+            color: var(--md-on-surface-variant, #64748b);
+            margin-bottom: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .dashboard-card h3 {
-            color: var(--md-on-surface);
-            font-weight: 700;
+            color: var(--md-on-surface, #0f172a);
+            font-weight: 800;
             font-size: 28px;
+            line-height: 1.2;
+            margin-bottom: 2px;
         }
 
         .dashboard-card h5 {
-            color: var(--md-on-surface);
-            font-weight: 600;
+            color: var(--md-on-surface, #0f172a);
+            font-weight: 700;
+            font-size: 20px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .dashboard-card small {
+            color: var(--md-on-surface-variant, #94a3b8);
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Charts Section */
+        .chart-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            height: 100%;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .chart-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        }
+
+        .chart-card .card-header {
+            background: transparent;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1.25rem 1.5rem;
+            font-weight: 700;
+            color: var(--md-on-surface, #1e293b);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .chart-card .card-body {
+            padding: 1.5rem;
         }
     </style>
 
@@ -112,105 +198,133 @@ include_once 'config/base.php';
         </div>
 
         <div class="mt-4 mb-4">
-            <div class="row g-3">
+            <div class="row g-4">
                 <!-- New -->
                 <div class="col-sm-6 col-md-3">
-                    <div class="dashboard-card card-new d-flex justify-content-between align-items-center p-3">
-                        <div>
-                            <p class="mb-1">New</p>
-                            <h3 id="status-new" class="mb-0">0</h3>
-                            <small>สถานะใหม่ทั้งหมด</small>
-                        </div>
-                        <div class="icon-box icon-new">
+                    <div class="dashboard-card card-new" style="cursor: pointer;" onclick="window.location.href='listvisitor.php?page=listvisitor&status=1'">
+                        <div class="icon-box">
                             <i class="ti ti-sparkles"></i>
+                        </div>
+                        <div class="card-content">
+                            <p>New</p>
+                            <h3 id="status-new">0</h3>
+                            <small>สถานะใหม่ทั้งหมด</small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Accepted -->
                 <div class="col-sm-6 col-md-3">
-                    <div class="dashboard-card card-accept d-flex justify-content-between align-items-center p-3">
-                        <div>
-                            <p class="mb-1">Accepted</p>
-                            <h3 id="status-acept" class="mb-0">0</h3>
+                    <div class="dashboard-card card-accept" style="cursor: pointer;" onclick="window.location.href='listvisitor.php?page=listvisitor&status=2'">
+                        <div class="icon-box">
+                            <i class="ti ti-check"></i>
+                        </div>
+                        <div class="card-content">
+                            <p>Accepted</p>
+                            <h3 id="status-acept">0</h3>
+                            <small>รับทราบการนัดหมาย</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approved -->
+                <div class="col-sm-6 col-md-3">
+                    <div class="dashboard-card card-approved" style="cursor: pointer;" onclick="window.location.href='listvisitor.php?page=listvisitor&status=3'">
+                        <div class="icon-box">
+                            <i class="ti ti-user-check"></i>
+                        </div>
+                        <div class="card-content">
+                            <p>Approved</p>
+                            <h3 id="status-approved">0</h3>
                             <small>ที่ได้รับการอนุมัติ</small>
                         </div>
-                        <div class="icon-box icon-accept">
-                            <i class="ti ti-circle-check"></i>
+                    </div>
+                </div>
+
+                <!-- Submit -->
+                <div class="col-sm-6 col-md-3">
+                    <div class="dashboard-card card-submit" style="cursor: pointer;" onclick="window.location.href='listvisitor.php?page=listvisitor&status=5'">
+                        <div class="icon-box">
+                            <i class="ti ti-send"></i>
+                        </div>
+                        <div class="card-content">
+                            <p>Submit</p>
+                            <h3 id="status-submit">0</h3>
+                            <small>ขออนุมัติเข้าพบ</small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Closed -->
                 <div class="col-sm-6 col-md-3">
-                    <div class="dashboard-card card-closed d-flex justify-content-between align-items-center p-3">
-                        <div>
-                            <p class="mb-1">Closed</p>
-                            <h3 id="status-closed" class="mb-0">0</h3>
-                            <small>ที่ปิดงานแล้ว</small>
-                        </div>
-                        <div class="icon-box icon-closed">
+                    <div class="dashboard-card card-closed" style="cursor: pointer;" onclick="window.location.href='listvisitor.php?page=listvisitor&status=6'">
+                        <div class="icon-box">
                             <i class="ti ti-archive"></i>
+                        </div>
+                        <div class="card-content">
+                            <p>Closed</p>
+                            <h3 id="status-closed">0</h3>
+                            <small>ที่ปิดงานแล้ว</small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Total Visitor -->
                 <div class="col-sm-6 col-md-3">
-                    <div class="dashboard-card card-visitor d-flex justify-content-between align-items-center p-3">
-                        <div>
-                            <p class="mb-1">Total Visitor</p>
-                            <h3 id="total-visitor" class="mb-0">0</h3>
-                            <small>จำนวนผู้เยี่ยมชมทั้งหมด</small>
-                        </div>
-                        <div class="icon-box icon-visitor">
+                    <div class="dashboard-card card-visitor">
+                        <div class="icon-box">
                             <i class="ti ti-users"></i>
+                        </div>
+                        <div class="card-content">
+                            <p>Total Visitor</p>
+                            <h3 id="total-visitor">0</h3>
+                            <small>จำนวนผู้เยี่ยมชมทั้งหมด</small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Total Quiz -->
                 <div class="col-sm-6 col-md-3">
-                    <div class="dashboard-card card-quiz d-flex justify-content-between align-items-center p-3">
-                        <div>
-                            <p class="mb-1">Total Quiz</p>
-                            <h3 id="total-quiz" class="mb-0">0</h3>
-                            <small>จำนวนแบบสอบถามทั้งหมด</small>
-                        </div>
-                        <div class="icon-box icon-quiz">
+                    <div class="dashboard-card card-quiz">
+                        <div class="icon-box">
                             <i class="ti ti-clipboard-list"></i>
+                        </div>
+                        <div class="card-content">
+                            <p>Total Quiz</p>
+                            <h3 id="total-quiz">0</h3>
+                            <small>จำนวนแบบสอบถามทั้งหมด</small>
                         </div>
                     </div>
                 </div>
 
                 <!-- Top Objective -->
                 <div class="col-sm-6 col-md-3">
-                    <div class="dashboard-card card-objective d-flex justify-content-between align-items-center p-3">
-                        <div class="w-75">
-                            <p class="mb-1">Top Objective</p>
-                            <h5 id="top-objective" class="mb-0">-</h5>
-                            <small id="top-objective-detail">ไม่มีข้อมูล</small>
-                        </div>
-                        <div class="icon-box icon-objective">
+                    <div class="dashboard-card card-objective">
+                        <div class="icon-box">
                             <i class="ti ti-target"></i>
+                        </div>
+                        <div class="card-content">
+                            <p>Top Objective</p>
+                            <h5 id="top-objective">-</h5>
+                            <small id="top-objective-detail">ไม่มีข้อมูล</small>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Charts -->
-            <div class="row mt-4">
+            <div class="row mt-4 g-4">
                 <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header"><i class="ti ti-chart-pie me-2" style="color: var(--md-primary);"></i>Visitor Type Summary</div>
+                    <div class="chart-card">
+                        <div class="card-header"><i class="ti ti-chart-pie me-2" style="color: #3b82f6;"></i>Visitor Type Summary</div>
                         <div class="card-body">
                             <canvas id="visitorTypeChart"></canvas>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="card">
-                        <div class="card-header"><i class="ti ti-chart-donut me-2" style="color: var(--md-primary);"></i>Purpose Summary</div>
+                    <div class="chart-card">
+                        <div class="card-header"><i class="ti ti-chart-donut me-2" style="color: #f43f5e;"></i>Purpose Summary</div>
                         <div class="card-body">
                             <canvas id="purposeChart"></canvas>
                         </div>
@@ -281,6 +395,8 @@ include_once 'config/base.php';
 
                 $('#status-new').text(status.New);
                 $('#status-acept').text(status.Acept);
+                $('#status-approved').text(status.Approved);
+                $('#status-submit').text(status.Submit);
                 $('#status-closed').text(status.Closed);
 
                 const quiz = data.QuizSummary;

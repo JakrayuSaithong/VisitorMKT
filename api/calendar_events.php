@@ -37,50 +37,60 @@ try {
         $corp = json_decode($row['CorporateDetail'], true);
         if (!$corp) continue;
         
-        // Convert date from dd/mm/yyyy to yyyy-mm-dd
-        $eventDate = convertDate($corp['date'] ?? '');
-        if (!$eventDate) continue;
-        
-        $timeStart = $corp['timeStart'] ?? '';
-        $timeEnd = $corp['timeEnd'] ?? '';
-        
-        // 1. Welcome Service Event (ป้ายต้อนรับ)
-        if (!empty($corp['useWelcomeService'])) {
-            $events[] = [
-                'id' => 'welcome_' . $row['Id'],
-                'title' => 'ป้ายต้อนรับ',
-                'start' => $eventDate . ($corp['welcomeTimeStart'] ? 'T' . $corp['welcomeTimeStart'] : ''),
-                'end' => $eventDate . ($corp['welcomeTimeEnd'] ? 'T' . $corp['welcomeTimeEnd'] : ''),
-                'extendedProps' => [
-                    'visitorFormId' => $row['Id'],
-                    'docNo' => $row['DocNo'],
-                    'eventType' => 'Welcome',
-                    'timeStart' => $corp['welcomeTimeStart'] ?? '',
-                    'timeEnd' => $corp['welcomeTimeEnd'] ?? '',
-                    'detail' => $corp['welcomeDetail'] ?? ''
-                ]
-            ];
+        $entries = [];
+        if (isset($corp['entries']) && is_array($corp['entries'])) {
+            $entries = $corp['entries'];
+        } else if (isset($corp['date'])) {
+            $entries[] = $corp;
         }
-        
-        // 3. Photo Service Event (ถ่ายรูป)
-        if (!empty($corp['usePhotoService'])) {
-            $locations = $corp['photoLocations'] ?? [];
-            $locationText = is_array($locations) ? implode(', ', $locations) : '';
+
+        foreach ($entries as $index => $entry) {
+            // Convert date from dd/mm/yyyy to yyyy-mm-dd
+            $eventDate = convertDate($entry['date'] ?? '');
+            if (!$eventDate) continue;
             
-            $events[] = [
-                'id' => 'photo_' . $row['Id'],
-                'title' => 'ถ่ายรูป',
-                'start' => $eventDate . ($corp['photoTimeStart'] ? 'T' . $corp['photoTimeStart'] : ''),
-                'end' => $eventDate . ($corp['photoTimeEnd'] ? 'T' . $corp['photoTimeEnd'] : ''),
-                'extendedProps' => [
-                    'visitorFormId' => $row['Id'],
-                    'docNo' => $row['DocNo'],
-                    'eventType' => 'Photo',
-                    'timeStart' => $corp['photoTimeStart'] ?? '',
-                    'timeEnd' => $corp['photoTimeEnd'] ?? '',
-                    'detail' => 'สถานที่: ' . $locationText
-                ]
-            ];
+            // 1. Welcome Service Event (ป้ายต้อนรับ)
+            if (!empty($entry['useWelcomeService'])) {
+                $timeStartStr = !empty($entry['welcomeTimeStart']) ? ('T' . $entry['welcomeTimeStart']) : '';
+                $timeEndStr = !empty($entry['welcomeTimeEnd']) ? ('T' . $entry['welcomeTimeEnd']) : '';
+                $events[] = [
+                    'id' => 'welcome_' . $row['Id'] . '_' . $index,
+                    'title' => 'ป้ายต้อนรับ',
+                    'start' => $eventDate . $timeStartStr,
+                    'end' => $eventDate . $timeEndStr,
+                    'extendedProps' => [
+                        'visitorFormId' => $row['Id'],
+                        'docNo' => $row['DocNo'],
+                        'eventType' => 'Welcome',
+                        'timeStart' => $entry['welcomeTimeStart'] ?? '',
+                        'timeEnd' => $entry['welcomeTimeEnd'] ?? '',
+                        'detail' => $entry['welcomeDetail'] ?? ''
+                    ]
+                ];
+            }
+            
+            // 3. Photo Service Event (ถ่ายรูป)
+            if (!empty($entry['usePhotoService'])) {
+                $locations = $entry['photoLocations'] ?? [];
+                $locationText = is_array($locations) ? implode(', ', $locations) : '';
+                
+                $timeStartStr = !empty($entry['photoTimeStart']) ? ('T' . $entry['photoTimeStart']) : '';
+                $timeEndStr = !empty($entry['photoTimeEnd']) ? ('T' . $entry['photoTimeEnd']) : '';
+                $events[] = [
+                    'id' => 'photo_' . $row['Id'] . '_' . $index,
+                    'title' => 'ถ่ายรูป',
+                    'start' => $eventDate . $timeStartStr,
+                    'end' => $eventDate . $timeEndStr,
+                    'extendedProps' => [
+                        'visitorFormId' => $row['Id'],
+                        'docNo' => $row['DocNo'],
+                        'eventType' => 'Photo',
+                        'timeStart' => $entry['photoTimeStart'] ?? '',
+                        'timeEnd' => $entry['photoTimeEnd'] ?? '',
+                        'detail' => 'สถานที่: ' . $locationText
+                    ]
+                ];
+            }
         }
     }
     

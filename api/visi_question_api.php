@@ -34,7 +34,7 @@ $purpose    = trim($data['purpose'] ?? '');
 $suggestion = trim($data['suggestion'] ?? '');
 $eval       = $data['eval'] ?? null;
 
-if ($company === '' || $fullname === '' || $project === '' || $purpose === '' || $suggestion === '') {
+if ($purpose === '' || $eval === '') {
     echo json_encode(['status' => false, 'message' => 'กรุณากรอกข้อมูลให้ครบถ้วน']);
     exit;
 }
@@ -55,12 +55,12 @@ if ($purpose === 'ทดสอบผลิตภัณฑ์') {
 }
 
 $store_json = json_encode([
-    'company'    => $company,
-    'fullname'   => $fullname,
-    'phone'      => $phone,
-    'email'      => $email,
-    'project'    => $project,
-    'purpose'    => $purpose,
+    // 'company'    => $company,
+    // 'fullname'   => $fullname,
+    // 'phone'      => $phone,
+    // 'email'      => $email,
+    // 'project'    => $project,
+    // 'purpose'    => $purpose,
     'suggestion' => $suggestion,
     'eval'       => $eval
 ], JSON_UNESCAPED_UNICODE);

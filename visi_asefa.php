@@ -189,6 +189,7 @@ $rawId = isset($_GET['id']) ? intval($_GET['id']) : 0;
                         <div style="font-size:28px;margin-bottom:4px;">🎉</div>
                         <div style="font-weight:600;">ยืนยันสำเร็จ!</div>
                         <div class="welcome" id="welcomeName">ยินดีต้อนรับ</div>
+                        <div id="docNoDisplay" style="font-size:12px;opacity:.75;margin-top:4px;"></div>
                     </div>
 
                     <div class="map-wrap">
@@ -260,6 +261,7 @@ $rawId = isset($_GET['id']) ? intval($_GET['id']) : 0;
                     info.style.display = 'block';
 
                     document.getElementById('welcomeName').textContent = 'ยินดีต้อนรับ คุณ' + (data.name || '');
+                    document.getElementById('docNoDisplay').textContent = data.doc_no ? ('เลขที่เอกสาร: ' + data.doc_no) : '';
                     document.getElementById('visitDate').textContent = data.visit_date || '—';
                     document.getElementById('visitTime').textContent = data.visit_time || '—';
                     document.getElementById('visitZone').textContent = data.zone || '—';
